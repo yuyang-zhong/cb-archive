@@ -1,48 +1,55 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Search from '../components/Search.astro';
 
 const features = [
 	{
 		title: "Governing Documents",
 		description: "Bylaws, CC&Rs, and Rules & Regulations. Understand how our community is managed.",
 		link: "/cb-archive/governing",
-		icon: "📜"
-	},
-		{
-		title: "Current Policies",
-		description: "Active community rules, amenity guidelines, and architectural standards.",
-		link: "/cb-archive/policies",
-		icon: "📋"
+		icon: "📜",
+		status: "Active"
 	},
 	{
 		title: "Service Contracts",
 		description: "Active agreements with community vendors, maintenance, and utility providers.",
 		link: "/cb-archive/contracts",
-		icon: "🤝"
+		icon: "🤝",
+		status: "Active"
+	},
+	{
+		title: "Current Policies",
+		description: "Active community rules, amenity guidelines, and architectural standards.",
+		link: "/cb-archive/policies",
+		icon: "📋",
+		status: "Active"
 	},
 	{
 		title: "Financials & Budgets",
 		description: "Past financials and current budgets. Track where community funds are spent.",
 		link: "/cb-archive/financials",
-		icon: "📊"
+		icon: "📊",
+		status: "Coming Soon"
 	},
 	{
 		title: "History & Construction",
 		description: "From groundbreaking to completion. Archives of our building's development.",
 		link: "/cb-archive/history",
-		icon: "🏗️"
+		icon: "🏗️",
+		status: "Coming Soon"
 	},
 	{
 		title: "Neighborhood Parking",
 		description: "Parking maps, rules for guests, and registration information.",
 		link: "/cb-archive/parking",
-		icon: "🚗"
+		icon: "🚗",
+		status: "Coming Soon"
 	}
 ];
 ---
 
 <BaseLayout title="Home">
-	<section class="py-12 md:py-20 text-center">
+	<section class="py-12 md:py-20 text-center" data-pagefind-ignore>
 		<h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">
 			Welcome to the <span class="text-blue-700">China Basin Community Archive</span>
 		</h1>
@@ -59,6 +66,11 @@ const features = [
 			</a>
 		</div>
 
+		<!-- Full-text search bar -->
+		<div class="max-w-2xl mx-auto mt-12 px-4">
+			<Search />
+		</div>
+
 		<div class="mt-12 bg-slate-50 border border-slate-100 rounded-xl p-4 max-w-xl mx-auto text-xs text-slate-500 italic">
 			Note: This is a volunteer project run by a fellow homeowner. Content on this site was parsed using NotebookLM (AI tool) and may contain errors. Please reference the official documents for accuracy. This portal was built with Gemini.
 		</div>
@@ -67,10 +79,20 @@ const features = [
 	<section id="explore" class="py-12 border-t border-slate-100">
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 			{features.map(f => (
-				<a href={f.link} class="group p-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200 transition">
-					<div class="text-3xl mb-4">{f.icon}</div>
+				<a href={f.link} class="group p-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200 transition flex flex-col h-full">
+					<div class="flex justify-between items-start mb-4">
+						<div class="text-3xl">{f.icon}</div>
+						{f.status === "Coming Soon" && (
+							<span class="bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border border-slate-200">
+								Soon
+							</span>
+						)}
+					</div>
 					<h3 class="text-xl font-bold text-slate-900 group-hover:text-blue-700 mb-2 transition">{f.title}</h3>
-					<p class="text-slate-600 leading-relaxed">{f.description}</p>
+					<p class="text-slate-600 leading-relaxed flex-grow">{f.description}</p>
+					<div class="mt-6 pt-4 border-t border-slate-50 text-blue-700 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+						{f.status === "Coming Soon" ? "Check back later →" : "View Archive →"}
+					</div>
 				</a>
 			))}
 		</div>
@@ -88,4 +110,6 @@ const features = [
 			Latest Update: April 2026
 		</div>
 	</section>
+</BaseLayout>
+tion>
 </BaseLayout>

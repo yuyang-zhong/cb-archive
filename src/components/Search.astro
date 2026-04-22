@@ -1,0 +1,90 @@
+---
+---
+
+<div id="search" class="w-full max-w-2xl mx-auto my-8 text-left"></div>
+
+<link href="/cb-archive/pagefind/pagefind-ui.css" rel="stylesheet">
+<script src="/cb-archive/pagefind/pagefind-ui.js" is:inline></script>
+
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    new PagefindUI({ 
+        element: "#search", 
+        showSubResults: true,
+        baseUrl: "/cb-archive/",
+        bundlePath: "/cb-archive/pagefind/",
+        translations: {
+            placeholder: "Search documents, rules, or contracts..."
+        }
+    });
+  });
+</script>
+
+<style is:global>
+  /* Customizing Pagefind UI to match our theme */
+  :root {
+    --pagefind-ui-primary: #1d4ed8; /* blue-700 */
+    --pagefind-ui-text: #0f172a;    /* slate-900 */
+    --pagefind-ui-background: #ffffff;
+    --pagefind-ui-border: #e2e8f0;  /* slate-200 */
+    --pagefind-ui-tag: #f1f5f9;     /* slate-100 */
+  }
+  
+  /* Container for the entire search UI */
+  .pagefind-ui {
+    text-align: left !important;
+  }
+
+  .pagefind-ui__search-input {
+    border-radius: 0.75rem !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+    text-align: left !important;
+  }
+
+  /* The results drawer */
+  .pagefind-ui__drawer {
+    margin-top: 1rem !important;
+    padding: 1.5rem !important;
+    border-radius: 1rem !important;
+    border: 1px solid #f1f5f9 !important;
+    background-color: rgba(248, 250, 252, 0.8) !important; /* slate-50 with 80% opacity */
+    text-align: left !important;
+  }
+  
+  .pagefind-ui__result {
+    border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
+    padding-bottom: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .pagefind-ui__result:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .pagefind-ui__result-link {
+    color: #1d4ed8 !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    display: block !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .pagefind-ui__result-link:hover {
+    text-decoration: underline !important;
+  }
+
+  .pagefind-ui__result-excerpt {
+    color: #475569 !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5rem !important;
+    text-align: left !important;
+  }
+
+  /* Styling for the section labels (metadata) */
+  .pagefind-ui__result-nested {
+    margin-top: 0.25rem !important;
+  }
+</style>

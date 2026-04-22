@@ -15,8 +15,8 @@ const { Content } = await render(entry);
 ---
 
 <BaseLayout title={entry.data.title}>
-	<div class="max-w-4xl mx-auto">
-		<a href="/cb-archive/policies" class="text-blue-700 text-sm font-medium hover:underline mb-8 inline-block">← Back to Policies</a>
+	<div class="max-w-4xl mx-auto" data-pagefind-filter="Section:Current Policies">
+		<a href="/cb-archive/policies" class="text-blue-700 text-sm font-medium hover:underline mb-8 inline-block" data-pagefind-ignore>← Back to Policies</a>
 		<header class="mb-10">
 			<div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-4">
 				<h1 class="text-4xl font-extrabold text-slate-900 flex-1">{entry.data.title}</h1>

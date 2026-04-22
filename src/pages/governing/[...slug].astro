@@ -15,8 +15,8 @@ const { Content } = await render(entry);
 ---
 
 <BaseLayout title={entry.data.title}>
-	<div class="max-w-4xl mx-auto">
-		<a href="/cb-archive/governing" class="text-blue-700 text-sm font-medium hover:underline mb-8 inline-block">← Back to Governing Documents</a>
+	<div class="max-w-4xl mx-auto" data-pagefind-filter="Section:Governing Documents">
+		<a href="/cb-archive/governing" class="text-blue-700 text-sm font-medium hover:underline mb-8 inline-block" data-pagefind-ignore>← Back to Governing Documents</a>
 		
 		<header class="mb-10">
 			<h1 class="text-4xl font-extrabold text-slate-900 mb-4">{entry.data.title}</h1>
