@@ -17,6 +17,8 @@ This document governs the reservation and daily use of community recreational sp
 ## Clubhouse Reservations
 To reserve the Clubhouse, an Owner must submit a $100 non-refundable usage fee and a $350 refundable damage deposit. A reservation cannot exceed five hours.
 
+**To request a reservation:** Email [managerassistanthelp@actionlife.com](mailto:managerassistanthelp@actionlife.com?subject=400%20China%20Basin%20-%20Clubhouse%20Reservation%20Request) with your preferred date and time.
+
 ## Other Amenities
 The Yoga/Play Room and Business Center can be reserved without a fee or deposit, provided:
 *   No food or drinks (other than water) are served.

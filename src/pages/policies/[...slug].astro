@@ -23,17 +23,7 @@ const { Content } = await render(entry);
 				{entry.data.cost && (
 					<div class="bg-blue-50 border border-blue-200 p-5 rounded-2xl shadow-sm text-center shrink-0">
 						<span class="block text-[10px] uppercase tracking-widest font-bold text-blue-800 mb-1">Fee/Deposit</span>
-						<span class="text-2xl font-black text-blue-900 mb-3 block">{entry.data.cost}</span>
-						{entry.data.pdfLink && (
-							<div class="flex flex-col gap-2">
-								<a href={entry.data.pdfLink} class="text-sm bg-blue-700 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-800 transition" target="_blank">
-									↓ Download Form
-								</a>
-								<a href="mailto:management@chinabasin.com?subject=Form%20Submission" class="text-sm bg-white text-blue-700 border border-blue-200 py-2 px-4 rounded-lg font-medium hover:bg-blue-50 transition">
-									✉️ Submit Form
-								</a>
-							</div>
-						)}
+						<span class="text-2xl font-black text-blue-900 mb-0.5 block">{entry.data.cost}</span>
 					</div>
 				)}
 			</div>
@@ -49,7 +39,7 @@ const { Content } = await render(entry);
 					<h3 class="font-bold text-slate-900">Official Document</h3>
 					<p class="text-slate-500 text-sm">Download the original PDF for reference.</p>
 				</div>
-				<a href={entry.data.pdfLink} class="bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 transition" target="_blank">Download PDF</a>
+				<a href={`/cb-archive${entry.data.pdfLink}`} class="bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 transition" target="_blank">Download PDF</a>
 			</div>
 		)}
 	</div>
