@@ -1,0 +1,110 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const docs = await getCollection('contracts');
+
+// Calculate Financial Summaries (Active only)
+const TOTAL_UNITS = 148;
+const AVERAGE_ASSESSMENT = 460;
+const activeDocs = docs.filter(doc => doc.data.status === 'Active');
+const totalMonthly = activeDocs.reduce((acc, doc) => acc + (doc.data.monthlyCost || 0), 0);
+const averagePerUnit = totalMonthly / TOTAL_UNITS;
+const percentOfAssessment = (averagePerUnit / AVERAGE_ASSESSMENT) * 100;
+
+const formatCurrency = (num: number) => {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+};
+---
+<BaseLayout title="Service Contracts">
+	<div class="mb-12">
+		<h1 class="text-4xl font-extrabold text-slate-900 mb-4">Service Contracts</h1>
+		<p class="text-lg text-slate-600 max-w-3xl mb-8">Review active service agreements and contracts with community vendors and partners.</p>
+
+		<!-- Financial Insight Cards -->
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<div class="bg-blue-600 rounded-2xl p-6 text-white shadow-lg shadow-blue-100">
+				<span class="block text-xs uppercase tracking-widest font-bold opacity-80 mb-1">Total Monthly Commitments</span>
+				<div class="flex items-baseline gap-2">
+					<span class="text-4xl font-black">{formatCurrency(totalMonthly)}</span>
+					<span class="text-blue-200 text-sm">/ Month</span>
+				</div>
+				<p class="mt-2 text-xs text-blue-100 italic">* Based on currently active service contracts</p>
+			</div>
+			<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+				<div>
+					<span class="block text-xs uppercase tracking-widest font-bold text-slate-400 mb-1">Cost Per Household</span>
+					<div class="flex items-baseline gap-2">
+						<span class="text-4xl font-black text-slate-900">{formatCurrency(averagePerUnit)}</span>
+						<span class="text-slate-500 text-sm">/ Unit / Month</span>
+					</div>
+				</div>
+				<div class="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+					<span class="text-xs text-slate-500 italic">~{percentOfAssessment.toFixed(1)}% of avg. $460 assessment</span>
+					<div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+						<div class="h-full bg-blue-500" style={`width: ${percentOfAssessment}%`}></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="space-y-6">
+		{docs.length === 0 ? (
+			<div class="p-12 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl">
+				<p class="text-slate-500 italic">No contract documents found yet.</p>
+			</div>
+		) : (
+			docs.map(doc => (
+				<div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-start justify-between gap-6">
+					<div class="flex-1">
+						<div class="flex items-center gap-3 mb-2">
+							<h2 class="text-xl font-bold text-slate-900">{doc.data.title}</h2>
+							<span class={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+								doc.data.status === 'Active' ? 'bg-green-100 text-green-700 border border-green-200' : 
+								doc.data.status === 'Terminated' ? 'bg-red-100 text-red-700 border border-red-200' : 
+								'bg-slate-100 text-slate-600 border border-slate-200'
+							}`}>
+								{doc.data.status}
+							</span>
+						</div>
+						<p class="text-slate-600 mb-4 text-sm leading-relaxed">{doc.data.description}</p>
+						
+						<div class="flex flex-wrap gap-4 text-[11px] font-medium text-slate-400 uppercase tracking-tight">
+							{doc.data.executedDate && (
+								<div class="flex items-center gap-1.5">
+									<span class="opacity-70">Executed:</span>
+									<span class="text-slate-600">{doc.data.executedDate}</span>
+								</div>
+							)}
+							{doc.data.terminationDate && (
+								<div class="flex items-center gap-1.5">
+									<span class="opacity-70 text-red-400">Terminated:</span>
+									<span class="text-red-600">{doc.data.terminationDate}</span>
+								</div>
+							)}
+						</div>
+						
+						<div class="mt-4 pt-4 border-t border-slate-50">
+							<a href={`/contracts/${doc.id}`} class="text-blue-700 font-semibold text-sm hover:underline">View Contract Details →</a>
+						</div>
+					</div>
+					<div class="flex flex-col gap-2 min-w-[160px] self-start md:self-center">
+						{doc.data.cost && (
+							<div class="bg-slate-50 border border-slate-100 px-6 py-4 rounded-xl text-center">
+								<span class="block text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">Monthly Cost</span>
+								<span class="text-xl font-black text-slate-900">{doc.data.cost}</span>
+							</div>
+						)}
+						{doc.data.oneTimeCost && (
+							<div class="bg-amber-50 border border-amber-100 px-4 py-2 rounded-lg text-center">
+								<span class="block text-[9px] uppercase tracking-wider text-amber-600 font-bold">One-Time Fee</span>
+								<span class="text-sm font-bold text-amber-900">{doc.data.oneTimeCost}</span>
+							</div>
+						)}
+					</div>
+				</div>
+			))
+		)}
+	</div>
+</BaseLayout>

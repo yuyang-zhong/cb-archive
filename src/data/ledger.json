@@ -1,0 +1,9 @@
+[
+  { "date": "2024-03-01", "category": "Utilities", "description": "Water & Sewer - City Services", "amount": 1250.40 },
+  { "date": "2024-03-05", "category": "Maintenance", "description": "Elevator Monthly Service", "amount": 450.00 },
+  { "date": "2024-03-10", "category": "Landscaping", "description": "Spring Planting & Mulch", "amount": 800.00 },
+  { "date": "2024-03-15", "category": "Admin", "description": "Legal Consultation - Bylaw Review", "amount": 300.00 },
+  { "date": "2024-03-20", "category": "Utilities", "description": "Electricity - Common Areas", "amount": 940.20 },
+  { "date": "2024-04-01", "category": "Insurance", "description": "General Liability Policy Renewal", "amount": 5200.00 },
+  { "date": "2024-04-05", "category": "Maintenance", "description": "Roof Inspection", "amount": 600.00 }
+]

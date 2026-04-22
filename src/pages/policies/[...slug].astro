@@ -1,0 +1,57 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TakeawayCard from '../../components/TakeawayCard.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('policies');
+  return entries.map(entry => ({
+    params: { slug: entry.id }, props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={entry.data.title}>
+	<div class="max-w-4xl mx-auto">
+		<a href="/policies" class="text-blue-700 text-sm font-medium hover:underline mb-8 inline-block">← Back to Policies</a>
+		<header class="mb-10">
+			<div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-4">
+				<h1 class="text-4xl font-extrabold text-slate-900 flex-1">{entry.data.title}</h1>
+				{entry.data.cost && (
+					<div class="bg-blue-50 border border-blue-200 p-5 rounded-2xl shadow-sm text-center shrink-0">
+						<span class="block text-[10px] uppercase tracking-widest font-bold text-blue-800 mb-1">Fee/Deposit</span>
+						<span class="text-2xl font-black text-blue-900 mb-3 block">{entry.data.cost}</span>
+						{entry.data.pdfLink && (
+							<div class="flex flex-col gap-2">
+								<a href={entry.data.pdfLink} class="text-sm bg-blue-700 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-800 transition" target="_blank">
+									↓ Download Form
+								</a>
+								<a href="mailto:management@chinabasin.com?subject=Form%20Submission" class="text-sm bg-white text-blue-700 border border-blue-200 py-2 px-4 rounded-lg font-medium hover:bg-blue-50 transition">
+									✉️ Submit Form
+								</a>
+							</div>
+						)}
+					</div>
+				)}
+			</div>
+			<p class="text-xl text-slate-600 leading-relaxed">{entry.data.description}</p>
+		</header>
+		{entry.data.keyTakeaways && <TakeawayCard title={entry.data.title} takeaways={entry.data.keyTakeaways} />}
+		<article class="prose prose-slate prose-lg max-w-none prose-headings:text-slate-900 prose-headings:font-bold prose-a:text-blue-700 hover:prose-a:text-blue-800 prose-strong:text-slate-900">
+			<Content />
+		</article>
+		{entry.data.pdfLink && (
+			<div class="mt-12 p-6 border border-slate-200 rounded-xl flex items-center justify-between bg-white">
+				<div>
+					<h3 class="font-bold text-slate-900">Official Document</h3>
+					<p class="text-slate-500 text-sm">Download the original PDF for reference.</p>
+				</div>
+				<a href={entry.data.pdfLink} class="bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 transition" target="_blank">Download PDF</a>
+			</div>
+		)}
+	</div>
+</BaseLayout>
+out>

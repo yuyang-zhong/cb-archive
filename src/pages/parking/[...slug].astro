@@ -1,0 +1,38 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TakeawayCard from '../../components/TakeawayCard.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('parking');
+  return entries.map(entry => ({
+    params: { slug: entry.id }, props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={entry.data.title}>
+	<div class="max-w-4xl mx-auto">
+		<a href="/parking" class="text-blue-700 text-sm font-medium hover:underline mb-8 inline-block">← Back to Parking</a>
+		<header class="mb-10">
+			<h1 class="text-4xl font-extrabold text-slate-900 mb-4">{entry.data.title}</h1>
+			<p class="text-xl text-slate-600 leading-relaxed">{entry.data.description}</p>
+		</header>
+		{entry.data.keyTakeaways && <TakeawayCard title={entry.data.title} takeaways={entry.data.keyTakeaways} />}
+		<article class="prose prose-slate prose-lg max-w-none prose-headings:text-slate-900 prose-headings:font-bold prose-a:text-blue-700 hover:prose-a:text-blue-800 prose-strong:text-slate-900">
+			<Content />
+		</article>
+		{entry.data.pdfLink && (
+			<div class="mt-12 p-6 border border-slate-200 rounded-xl flex items-center justify-between bg-white">
+				<div>
+					<h3 class="font-bold text-slate-900">Official Rules</h3>
+					<p class="text-slate-500 text-sm">Download the original parking policy or map.</p>
+				</div>
+				<a href={`${entry.data.pdfLink}`} class="bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 transition" target="_blank">Download PDF</a>
+			</div>
+		)}
+	</div>
+</BaseLayout>

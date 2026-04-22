@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const features = [
+	{
+		title: "Governing Documents",
+		description: "Bylaws, CC&Rs, and Rules & Regulations. Understand how our community is managed.",
+		link: "/governing",
+		icon: "📜"
+	},
+	{
+		title: "Service Contracts",
+		description: "Active agreements with community vendors, maintenance, and utility providers.",
+		link: "/contracts",
+		icon: "🤝"
+	},
+	{
+		title: "Current Policies",
+		description: "Active community rules, amenity guidelines, and architectural standards.",
+		link: "/policies",
+		icon: "📋"
+	},
+	{
+		title: "Financials & Budgets",
+		description: "Past financials and current budgets. Track where community funds are spent.",
+		link: "/financials",
+		icon: "📊"
+	},
+	{
+		title: "History & Construction",
+		description: "From groundbreaking to completion. Archives of our building's development.",
+		link: "/history",
+		icon: "🏗️"
+	},
+	{
+		title: "Neighborhood Parking",
+		description: "Parking maps, rules for guests, and registration information.",
+		link: "/parking",
+		icon: "🚗"
+	}
+];
+---
+
+<BaseLayout title="Home">
+	<section class="py-12 md:py-20 text-center">
+		<h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">
+			Welcome to the <span class="text-blue-700">China Basin Community Archive</span>
+		</h1>
+		<p class="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+			A central hub for homeowners to navigate records, understand governing documents, 
+			and explore the financial health of our community.
+		</p>
+		<div class="flex flex-wrap justify-center gap-4">
+			<a href="/governing" class="bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-800 transition shadow-lg shadow-blue-200">
+				Browse Records
+			</a>
+			<a href="#explore" class="bg-white border border-slate-200 text-slate-700 px-8 py-3 rounded-lg font-semibold hover:bg-slate-50 transition">
+				Learn More
+			</a>
+		</div>
+
+		<div class="mt-12 bg-slate-50 border border-slate-100 rounded-xl p-4 max-w-xl mx-auto text-xs text-slate-500 italic">
+			Note: This is a volunteer project run by a fellow homeowner. Content on this site was parsed using NotebookLM (AI tool) and may contain errors. Please reference the official documents for accuracy. This portal was built with Gemini.
+		</div>
+	</section>
+
+	<section id="explore" class="py-12 border-t border-slate-100">
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+			{features.map(f => (
+				<a href={f.link} class="group p-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200 transition">
+					<div class="text-3xl mb-4">{f.icon}</div>
+					<h3 class="text-xl font-bold text-slate-900 group-hover:text-blue-700 mb-2 transition">{f.title}</h3>
+					<p class="text-slate-600 leading-relaxed">{f.description}</p>
+				</a>
+			))}
+		</div>
+	</section>
+
+	<section class="mt-12 p-8 bg-blue-50 rounded-2xl border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-6">
+		<div class="max-w-xl">
+			<h2 class="text-2xl font-bold text-blue-900 mb-2">Need a specific document?</h2>
+			<p class="text-blue-800/80">
+				All official PDFs are archived and available for download within each category. 
+				If you can't find something, contact the Board.
+			</p>
+		</div>
+		<div class="bg-white p-4 rounded-lg shadow-sm border border-blue-100 text-blue-900 font-medium">
+			Latest Update: April 2026
+		</div>
+	</section>
+</BaseLayout>

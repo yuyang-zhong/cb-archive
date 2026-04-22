@@ -1,0 +1,22 @@
+---
+interface Props {
+	title: string;
+	takeaways: string[];
+}
+
+const { title, takeaways } = Astro.props;
+---
+
+<div class="bg-blue-50 border border-blue-200 rounded-xl p-6 my-8 shadow-sm">
+	<h3 class="flex items-center gap-2 text-blue-900 font-bold text-lg mb-4">
+		<span class="text-xl">💡</span> Key Takeaways from {title}
+	</h3>
+	<ul class="space-y-3">
+		{takeaways.map((item) => (
+			<li class="flex gap-3 text-blue-800">
+				<span class="text-blue-400 mt-1">•</span>
+				<span class="leading-relaxed">{item}</span>
+			</li>
+		))}
+	</ul>
+</div>

@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const docs = await getCollection('governing');
+---
+
+<BaseLayout title="Governing Documents">
+	<div class="mb-12">
+		<h1 class="text-4xl font-extrabold text-slate-900 mb-4">Governing Documents</h1>
+		<p class="text-lg text-slate-600 max-w-3xl">
+			Access the core legal documents that govern our community, including CC&Rs, Bylaws, 
+			and Rules & Regulations. These documents define the rights and responsibilities of every homeowner.
+		</p>
+	</div>
+
+	<div class="space-y-8">
+		{docs.length === 0 ? (
+			<div class="p-12 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl">
+				<p class="text-slate-500 italic">No documents uploaded yet. Add Markdown files to src/content/governing/ to see them here.</p>
+			</div>
+		) : (
+			docs.map(doc => (
+				<div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+					<div class="flex justify-between items-start mb-4">
+						<div>
+							<h2 class="text-2xl font-bold text-slate-900 mb-1">{doc.data.title}</h2>
+							<p class="text-slate-500 text-sm">Last Updated: {doc.data.lastUpdated || 'N/A'}</p>
+						</div>
+						{doc.data.pdfLink && (
+							<a href={`${doc.data.pdfLink}`} class="bg-slate-900 text-white px-4 py-2 rounded text-sm font-medium hover:bg-slate-800 transition" target="_blank">
+								View PDF
+							</a>
+						)}
+					</div>
+					
+					<p class="text-slate-700 mb-6 leading-relaxed">
+						{doc.data.description}
+					</p>
+
+					{doc.data.keyTakeaways && (
+						<div class="bg-blue-50 border border-blue-100 rounded-xl p-5">
+							<h4 class="text-blue-900 font-bold text-sm uppercase tracking-wider mb-3">Key Takeaways</h4>
+							<ul class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+								{doc.data.keyTakeaways.map(t => (
+									<li class="text-blue-800 text-sm flex gap-2">
+										<span class="text-blue-300">•</span> {t}
+									</li>
+								))}
+							</ul>
+						</div>
+					)}
+					
+					<div class="mt-6 pt-6 border-t border-slate-100">
+						<a href={`/governing/${doc.id}`} class="text-blue-700 font-semibold hover:underline flex items-center gap-1">
+							Read Full Summary <span class="text-xs">→</span>
+						</a>
+					</div>
+				</div>
+			))
+		)}
+	</div>
+</BaseLayout>
