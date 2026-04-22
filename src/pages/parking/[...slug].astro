@@ -16,7 +16,7 @@ const { Content } = await render(entry);
 
 <BaseLayout title={entry.data.title}>
 	<div class="max-w-4xl mx-auto">
-		<a href="/parking" class="text-blue-700 text-sm font-medium hover:underline mb-8 inline-block">← Back to Parking</a>
+		<a href="/cb-archive/parking" class="text-blue-700 text-sm font-medium hover:underline mb-8 inline-block">← Back to Parking</a>
 		<header class="mb-10">
 			<h1 class="text-4xl font-extrabold text-slate-900 mb-4">{entry.data.title}</h1>
 			<p class="text-xl text-slate-600 leading-relaxed">{entry.data.description}</p>
@@ -31,7 +31,7 @@ const { Content } = await render(entry);
 					<h3 class="font-bold text-slate-900">Official Rules</h3>
 					<p class="text-slate-500 text-sm">Download the original parking policy or map.</p>
 				</div>
-				<a href={`${entry.data.pdfLink}`} class="bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 transition" target="_blank">Download PDF</a>
+				<a href={`/cb-archive${entry.data.pdfLink}`} class="bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 transition" target="_blank">Download PDF</a>
 			</div>
 		)}
 	</div>

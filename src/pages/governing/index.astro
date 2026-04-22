@@ -28,7 +28,7 @@ const docs = await getCollection('governing');
 							<p class="text-slate-500 text-sm">Last Updated: {doc.data.lastUpdated || 'N/A'}</p>
 						</div>
 						{doc.data.pdfLink && (
-							<a href={`${doc.data.pdfLink}`} class="bg-slate-900 text-white px-4 py-2 rounded text-sm font-medium hover:bg-slate-800 transition" target="_blank">
+							<a href={`/cb-archive${doc.data.pdfLink}`} class="bg-slate-900 text-white px-4 py-2 rounded text-sm font-medium hover:bg-slate-800 transition" target="_blank">
 								View PDF
 							</a>
 						)}
@@ -52,7 +52,7 @@ const docs = await getCollection('governing');
 					)}
 					
 					<div class="mt-6 pt-6 border-t border-slate-100">
-						<a href={`/governing/${doc.id}`} class="text-blue-700 font-semibold hover:underline flex items-center gap-1">
+						<a href={`/cb-archive/governing/${doc.id}`} class="text-blue-700 font-semibold hover:underline flex items-center gap-1">
 							Read Full Summary <span class="text-xs">→</span>
 						</a>
 					</div>

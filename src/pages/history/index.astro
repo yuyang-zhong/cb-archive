@@ -13,7 +13,7 @@ const docs = await getCollection('history');
 			<div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
 				<h2 class="text-xl font-bold mb-2">{doc.data.title}</h2>
 				<p class="text-slate-600 mb-4">{doc.data.description}</p>
-				<a href={`/history/${doc.id}`} class="text-blue-700 font-semibold hover:underline">Explore History →</a>
+				<a href={`/cb-archive/history/${doc.id}`} class="text-blue-700 font-semibold hover:underline">Explore History →</a>
 			</div>
 		))}
 	</div>

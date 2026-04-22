@@ -5,5 +5,6 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  site: 'https://username.github.io', 
+  site: 'https://yuyangzhong.github.io', 
+  base: '/cb-archive',
 });
