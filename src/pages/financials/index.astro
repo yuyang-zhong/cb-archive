@@ -2,21 +2,304 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Financials & Budgets">
+<BaseLayout title="Financial Overview">
 	<div class="mb-12">
-		<h1 class="text-4xl font-extrabold text-slate-900 mb-4">Financials & Budgets</h1>
+		<h1 class="text-4xl font-extrabold text-slate-900 mb-4">Financial Overview</h1>
 		<p class="text-lg text-slate-600 max-w-3xl">
-			Transparent access to our community's financial health. Review budget summaries, 
-			audited statements, and a searchable ledger of recent expenditures.
+			Transparent access to our community's financial health. We translate complex HOA financial documents into clear, easy-to-understand takeaways.
 		</p>
 	</div>
 
-	<div class="p-16 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl">
-		<div class="text-5xl mb-6">📊</div>
-		<h2 class="text-2xl font-bold text-slate-900 mb-2">Financial Records Coming Soon</h2>
-		<p class="text-slate-500 max-w-md mx-auto leading-relaxed">
-			We are currently parsing and auditing the community financial records. 
-			Check back later for the <strong>2025 Financials</strong> and a detailed <strong>2025 & 2026 Budget Breakdown</strong>.
-		</p>
+	<div class="space-y-12">
+		<!-- MOVED TO TOP: Health Indicator -->
+		<section class="bg-blue-50 rounded-3xl p-8 border border-blue-100 shadow-sm relative overflow-hidden">
+			<!-- Decorative background element -->
+			<div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 pointer-events-none"></div>
+			
+			<div class="relative z-10 flex flex-col md:flex-row gap-8 items-start md:items-center">
+				<div class="flex-shrink-0 bg-white p-6 rounded-2xl shadow-sm border border-blue-100 text-center md:w-48">
+					<div class="text-5xl mb-2">🌟</div>
+					<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Overall Rating</div>
+					<div class="text-xl font-bold text-green-600">Very Healthy</div>
+				</div>
+				
+				<div class="flex-grow">
+					<h2 class="text-2xl font-bold text-blue-900 mb-3">Strong Footing for the Future</h2>
+					<p class="text-blue-900 mb-5 text-lg leading-relaxed">Owners are inheriting a well-funded association with strong cash reserves, strict adherence to future repair savings, and no red flags regarding homeowner delinquencies.</p>
+					
+					<div class="flex flex-wrap gap-4">
+						<div class="bg-white/70 rounded-xl px-4 py-3 border border-blue-200/60 flex items-center gap-3 shadow-sm">
+							<div class="bg-green-100 text-green-600 rounded-full w-8 h-8 flex items-center justify-center font-bold">✓</div>
+							<div>
+								<span class="block text-xs font-semibold text-blue-800 uppercase">2026 Assessments</span>
+								<span class="block font-bold text-blue-900">Remaining Exactly the Same</span>
+							</div>
+						</div>
+						<div class="bg-white/70 rounded-xl px-4 py-3 border border-blue-200/60 flex items-center gap-3 shadow-sm">
+							<div class="bg-green-100 text-green-600 rounded-full w-8 h-8 flex items-center justify-center font-bold">✓</div>
+							<div>
+								<span class="block text-xs font-semibold text-blue-800 uppercase">Special Assessments</span>
+								<span class="block font-bold text-blue-900">None Anticipated</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- VISUAL AIDS FOR INCOME & SPENDING -->
+		<section>
+			<h2 class="text-2xl font-bold text-slate-900 border-b pb-2 mb-6">Breakdown of Association Income and Spending</h2>
+			<div class="grid lg:grid-cols-2 gap-6">
+				
+				<!-- Liquidity Card -->
+				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col">
+					<h3 class="text-lg font-bold text-slate-900 mb-5 flex justify-between items-end">
+						<span>Total Assets</span>
+						<span class="text-2xl text-green-700">$256,304</span>
+					</h3>
+					
+					<!-- Bar Chart Visualization -->
+					<div class="mb-6 flex-grow">
+						<div class="flex justify-between text-sm font-semibold mb-2">
+							<span class="text-emerald-700 flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Operating Cash</span>
+							<span class="text-emerald-700">$155,929.32</span>
+						</div>
+						<div class="w-full bg-slate-100 rounded-full h-4 mb-5">
+							<div class="bg-emerald-500 h-4 rounded-full" style="width: 59%"></div>
+						</div>
+
+						<div class="flex justify-between text-sm font-semibold mb-2">
+							<span class="text-blue-700 flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> Reserve Cash</span>
+							<span class="text-blue-700">$106,829.60</span>
+						</div>
+						<div class="w-full bg-slate-100 rounded-full h-4">
+							<div class="bg-blue-500 h-4 rounded-full" style="width: 41%"></div>
+						</div>
+					</div>
+					
+					<p class="text-sm text-slate-600 leading-relaxed">As of October 31, 2025, the HOA holds strong liquidity, bringing total assets to a very healthy level.</p>
+				</div>
+
+				<!-- Income vs Spending Card -->
+				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col">
+					<h3 class="text-lg font-bold text-slate-900 mb-5 flex justify-between items-end">
+						<span>Operating Surplus</span>
+						<span class="text-2xl text-green-700">+$139,961</span>
+					</h3>
+					
+					<div class="flex items-end gap-6 h-36 mb-6 px-4">
+						<!-- Income Bar -->
+						<div class="flex-1 flex flex-col justify-end group h-full">
+							<div class="text-center text-sm font-bold text-slate-700 mb-2">$372K</div>
+							<div class="bg-green-400 rounded-t-lg w-full relative transition-all duration-300 hover:bg-green-500 shadow-sm" style="height: 100%">
+								<div class="absolute inset-x-0 bottom-3 text-center text-xs font-bold text-green-900">Income</div>
+							</div>
+						</div>
+						<!-- Spending Bar -->
+						<div class="flex-1 flex flex-col justify-end group h-full">
+							<div class="text-center text-sm font-bold text-slate-700 mb-2">$232K</div>
+							<div class="bg-rose-400 rounded-t-lg w-full relative transition-all duration-300 hover:bg-rose-500 shadow-sm" style="height: 62%">
+								<div class="absolute inset-x-0 bottom-3 text-center text-xs font-bold text-rose-900">Spent</div>
+							</div>
+						</div>
+					</div>
+					<p class="text-sm text-slate-600 leading-relaxed">Year-to-date (YTD) Operating Income is <strong class="text-slate-900">$372,037.66</strong> compared to <strong class="text-slate-900">$232,076.48</strong> in disbursements. The HOA is currently operating with a large surplus.</p>
+				</div>
+
+				<!-- Spending Summary Card -->
+				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+					<h3 class="text-lg font-bold text-slate-900 mb-5">Key Spending Categories</h3>
+					
+					<div class="space-y-5 mb-5">
+						<div>
+							<div class="flex justify-between text-sm mb-1">
+								<span class="text-slate-700 font-medium">Utilities</span>
+								<span class="font-bold text-slate-900">$44,416.95</span>
+							</div>
+							<div class="w-full bg-slate-100 rounded-full h-2.5"><div class="bg-orange-400 h-2.5 rounded-full" style="width: 100%"></div></div>
+						</div>
+						<div>
+							<div class="flex justify-between text-sm mb-1">
+								<span class="text-slate-700 font-medium">Administration</span>
+								<span class="font-bold text-slate-900">$39,270.73</span>
+							</div>
+							<div class="w-full bg-slate-100 rounded-full h-2.5"><div class="bg-purple-400 h-2.5 rounded-full" style="width: 88%"></div></div>
+						</div>
+						<div>
+							<div class="flex justify-between text-sm mb-1">
+								<span class="text-slate-700 font-medium">Common Area Maint.</span>
+								<span class="font-bold text-slate-900">$34,535.15</span>
+							</div>
+							<div class="w-full bg-slate-100 rounded-full h-2.5"><div class="bg-sky-400 h-2.5 rounded-full" style="width: 77%"></div></div>
+						</div>
+					</div>
+					<p class="text-sm text-slate-600 leading-relaxed">These top categories make up the bulk of the $232,076.48 YTD disbursements.</p>
+				</div>
+
+				<!-- Savings Card -->
+				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center text-center">
+					<div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-blue-100 shadow-sm">
+						🏦
+					</div>
+					<h3 class="text-lg font-bold text-slate-900 mb-2">Saving for the Future</h3>
+					<div class="text-3xl font-extrabold text-blue-600 mb-3">$106,830</div>
+					<p class="text-sm text-slate-600 leading-relaxed px-4">Strictly adhering to its legally required savings plan, the Association transfers funds every month into the reserve account for a YTD total of <strong class="text-slate-900">$106,829.60</strong>.</p>
+				</div>
+			</div>
+			
+			<div class="mt-8 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
+				<p class="text-sm text-slate-500 italic">
+					<strong>Note:</strong> Due to the fluctuation of income and expenses inherent in a new development, Year-To-Date (YTD) totals are shown. Monthly averages do not yet accurately capture long-term spending patterns while the building is still in its initial move-in phase.
+				</p>
+			</div>
+		</section>
+
+		<section>
+			<h2 class="text-2xl font-bold text-slate-900 border-b pb-2 mb-6">Key Financial Trends to Understand</h2>
+			<div class="grid md:grid-cols-3 gap-6">
+				<!-- Trend 1 -->
+				<div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 flex flex-col hover:bg-slate-100 transition-colors">
+					<div class="flex items-center gap-3 mb-5">
+						<div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-xl shadow-sm">🏢</div>
+						<h3 class="font-bold text-slate-900 leading-tight">Developer Subsidization</h3>
+					</div>
+					
+					<!-- Visualization -->
+					<div class="flex h-3 rounded-full overflow-hidden mb-2 shadow-inner bg-slate-200">
+						<div class="bg-indigo-500" style="width: 78%" title="Developer: $267,839"></div>
+						<div class="bg-slate-400" style="width: 22%" title="Homeowners: $74,218"></div>
+					</div>
+					<div class="flex justify-between text-xs font-semibold text-slate-500 mb-4">
+						<span class="text-indigo-700">Developer ($267K)</span>
+						<span>Owners ($74K)</span>
+					</div>
+
+					<p class="text-sm text-slate-700 flex-grow leading-relaxed">As of October 31, 2025, because units have sold slower than initially anticipated, the developer is legally required to cover assessments for all unsold units, currently keeping the HOA afloat.</p>
+				</div>
+
+				<!-- Trend 2 -->
+				<div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 flex flex-col hover:bg-slate-100 transition-colors">
+					<div class="flex items-center gap-3 mb-5">
+						<div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-sm">🧹</div>
+						<h3 class="font-bold text-slate-900 leading-tight">Accounting Cleanups</h3>
+					</div>
+					<p class="text-sm text-slate-700 mb-4 flex-grow leading-relaxed">Transitioned to Action Property Management with a $50,000 "New Management Startup Funds" allocation. This caused accounting corrections, such as a mass refund of miscategorized $250 move-in deposits, creating a <strong class="text-rose-600">$(8,750.00)</strong> negative adjustment in October.</p>
+				</div>
+
+				<!-- Trend 3 -->
+				<div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 flex flex-col hover:bg-slate-100 transition-colors">
+					<div class="flex items-center gap-3 mb-5">
+						<div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center text-xl shadow-sm">⏳</div>
+						<h3 class="font-bold text-slate-900 leading-tight">Missing Expenses on Paper</h3>
+					</div>
+					<div class="space-y-3 mb-4">
+						<div class="flex items-center justify-between text-sm border-b border-slate-200 pb-2">
+							<span class="text-slate-600">Insurance Spent</span>
+							<span class="font-bold text-slate-900">$0 <span class="text-xs text-slate-400 font-normal">of $54k</span></span>
+						</div>
+						<div class="flex items-center justify-between text-sm">
+							<span class="text-slate-600">Water Collected</span>
+							<span class="font-bold text-slate-900">$0 <span class="text-xs text-slate-400 font-normal">of $79k</span></span>
+						</div>
+					</div>
+					<p class="text-sm text-slate-700 flex-grow leading-relaxed">These represent timing and billing delays likely to be reconciled at fiscal year-end.</p>
+				</div>
+			</div>
+		</section>
+		
+		<section>
+			<h2 class="text-2xl font-bold text-slate-900 border-b pb-2 mb-6">Maintenance Anomalies to Monitor</h2>
+			<p class="text-slate-700 mb-6 leading-relaxed">
+				Because this is a newly constructed building, there have been some initial, unbudgeted maintenance spikes. Here are specific transactions for community awareness:
+			</p>
+			
+			<div class="grid md:grid-cols-2 gap-6">
+				<!-- Anomaly 1 -->
+				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-start gap-4">
+					<div class="text-2xl bg-orange-50 text-orange-600 w-12 h-12 flex items-center justify-center rounded-xl flex-shrink-0">🗑️</div>
+					<div>
+						<h3 class="font-bold text-slate-900 mb-1">Clogged Trash Chutes</h3>
+						<p class="text-sm text-slate-600 mb-3">The HOA has paid multiple emergency janitorial fees to Superclean Building Services for clearing boxes jammed in the trash room/chutes ($410 in July & August 2025, $335 in September 2025).</p>
+						<div class="bg-orange-50 text-orange-800 text-xs font-medium px-3 py-2 rounded-lg">
+							<strong>Action:</strong> Please break down boxes and do not put them down the chute.
+						</div>
+					</div>
+				</div>
+
+				<!-- Anomaly 2 -->
+				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-start gap-4">
+					<div class="text-2xl bg-blue-50 text-blue-600 w-12 h-12 flex items-center justify-center rounded-xl flex-shrink-0">🛗</div>
+					<div>
+						<h3 class="font-bold text-slate-900 mb-1">Elevator Repair</h3>
+						<p class="text-sm text-slate-600 mb-3">In August 2025, the HOA paid Otis Elevator Company <strong>$6,075.00</strong> for elevator repairs.</p>
+						<div class="bg-blue-50 text-blue-800 text-xs font-medium px-3 py-2 rounded-lg">
+							<strong>Note:</strong> Going forward, routine elevator issues should be covered under our active elevator maintenance contract.
+						</div>
+					</div>
+				</div>
+
+				<!-- Anomaly 3 -->
+				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-start gap-4">
+					<div class="text-2xl bg-rose-50 text-rose-600 w-12 h-12 flex items-center justify-center rounded-xl flex-shrink-0">⚙️</div>
+					<div>
+						<h3 class="font-bold text-slate-900 mb-1">Trash Compactor</h3>
+						<p class="text-sm text-slate-600">In September 2025, the HOA paid Bay Area Trash Compactor a total of <strong>$2,417.62</strong> across three separate invoices for repairs to the compactor and the cart caddy.</p>
+					</div>
+				</div>
+
+				<!-- Anomaly 4 -->
+				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-start gap-4">
+					<div class="text-2xl bg-purple-50 text-purple-600 w-12 h-12 flex items-center justify-center rounded-xl flex-shrink-0">🚛</div>
+					<div>
+						<h3 class="font-bold text-slate-900 mb-1">Janitorial Trash Pull-Out Fees</h3>
+						<p class="text-sm text-slate-600 mb-3">Massive spikes in fees for "extra pull-out" services from our janitorial vendor jumped from $335 in September 2025 to multiple <strong>$1,310</strong> charges in October 2025.</p>
+						<div class="bg-green-50 text-green-800 text-xs font-medium px-3 py-2 rounded-lg">
+							<strong>Update:</strong> The developer has now stepped in and started covering these extra trash pull-out costs.
+						</div>
+					</div>
+				</div>
+				
+				<!-- Anomaly 5 -->
+				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-start gap-4 md:col-span-2 lg:col-span-1">
+					<div class="text-2xl bg-teal-50 text-teal-600 w-12 h-12 flex items-center justify-center rounded-xl flex-shrink-0">🐾</div>
+					<div>
+						<h3 class="font-bold text-slate-900 mb-1">Pet Amenity Plumbing</h3>
+						<p class="text-sm text-slate-600 mb-3">In late October 2025, the HOA paid <strong>$733.00</strong> for a "Pet Amenity Drain" repair.</p>
+						<div class="bg-teal-50 text-teal-800 text-xs font-medium px-3 py-2 rounded-lg">
+							<strong>Note:</strong> This repair is most likely related to the false alarm triggered by hot water steam in the pet amenity, resulting in an unnecessary SFFD call.
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="bg-blue-50 border border-blue-100 rounded-2xl p-6 text-center">
+			<p class="text-blue-800 font-medium italic">
+				Analysis will be updated when the remainder of 2025 statements are received.
+			</p>
+		</section>
+
+		<hr class="border-slate-200 my-8" />
+
+		<section>
+			<h3 class="text-lg font-bold text-slate-900 mb-3">Sources & Analysis</h3>
+			<p class="text-sm text-slate-600 mb-4">
+				This financial overview is based on an independent analysis conducted in <strong>April 2026</strong>. The numbers and insights are derived from the following verified documents:
+			</p>
+			<ul class="list-disc pl-5 text-sm text-slate-700 space-y-1 mb-8">
+				<li>June &ndash; October 2025 Financial Statements</li>
+				<li>2025 Approved Budget</li>
+				<li>2026 Approved Budget</li>
+			</ul>
+
+			<div class="p-6 border border-slate-200 rounded-xl bg-white shadow-sm">
+				<h3 class="font-bold text-slate-900 mb-2 text-lg">Official Record Request</h3>
+				<p class="text-slate-600 text-sm leading-relaxed">
+					Pursuant to California Civil Code § 5230, and due to the public nature of this website, public downloads of association financial statements and budgets are not available. Please review the official HOA portal or reach out to management to request a copy of these records. <a href="/cb-archive/#records-request" class="text-blue-700 hover:underline font-medium">Learn more about requesting records.</a>
+				</p>
+			</div>
+		</section>
+
 	</div>
 </BaseLayout>

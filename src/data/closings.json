@@ -1,0 +1,14 @@
+[
+  { "month": "May 2025", "new": 1, "total": 1 },
+  { "month": "Jun 2025", "new": 11, "total": 12 },
+  { "month": "Jul 2025", "new": 16, "total": 28 },
+  { "month": "Aug 2025", "new": 26, "total": 54 },
+  { "month": "Sept 2025", "new": 9, "total": 63 },
+  { "month": "Oct 2025", "new": 19, "total": 82 },
+  { "month": "Nov 2025", "new": 9, "total": 91 },
+  { "month": "Dec 2025", "new": 11, "total": 102 },
+  { "month": "Jan 2026", "new": 16, "total": 118 },
+  { "month": "Feb 2026", "new": 5, "total": 123 },
+  { "month": "Mar 2026", "new": 6, "total": 129 },
+  { "month": "Apr 2026", "new": 6, "total": 135 }
+]
