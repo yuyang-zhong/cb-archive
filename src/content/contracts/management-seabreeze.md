@@ -22,7 +22,7 @@ This contract was officially terminated by the Board of Directors. A formal noti
 ## Transition Details
 Management duties are scheduled to be fully transferred to the new management company by **October 31, 2025**. To ensure full cooperation during the transition, the Association has committed to paying the base management fee through the end of the original term (January 31, 2026).
 
-*   **Official Notice:** [Download Termination Letter](/cb-archive/documents/contracts/management-seabreeze-terminate.pdf)
+*   **Official Notice:** Termination letter is available upon request from management.
 
 ## Original Agreement Highlights
 *   **Term:** Initially one year from Feb 1, 2025.

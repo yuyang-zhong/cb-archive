@@ -72,14 +72,11 @@ const { Content } = await render(entry);
 			prose-strong:text-slate-900">
 			<Content />
 		</article>
-		{entry.data.pdfLink && (
-			<div class="mt-12 p-6 border border-slate-200 rounded-xl flex items-center justify-between bg-white">
-				<div>
-					<h3 class="font-bold text-slate-900">Official Contract</h3>
-					<p class="text-slate-500 text-sm">Download the original signed contract.</p>
-				</div>
-				<a href={`/cb-archive${entry.data.pdfLink}`} class="bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 transition" target="_blank">Download PDF</a>
-			</div>
-		)}
+		<div class="mt-12 p-6 border border-slate-200 rounded-xl bg-white">
+			<h3 class="font-bold text-slate-900 mb-2">Official Record Request</h3>
+			<p class="text-slate-600 text-sm leading-relaxed">
+				Pursuant to California Civil Code § 5230, and due to the public nature of this website, public downloads of association contracts and membership records are not available. Please review the official HOA portal or reach out to management to request a copy of this record. <a href="/cb-archive/#records-request" class="text-blue-700 hover:underline font-medium">Learn more about requesting records.</a>
+			</p>
+		</div>
 	</div>
 </BaseLayout>

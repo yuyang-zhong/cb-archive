@@ -98,16 +98,33 @@ const features = [
 		</div>
 	</section>
 
-	<section class="mt-12 p-8 bg-blue-50 rounded-2xl border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-6">
-		<div class="max-w-xl">
-			<h2 class="text-2xl font-bold text-blue-900 mb-2">Need a specific document?</h2>
-			<p class="text-blue-800/80">
-				All official PDFs are archived and available for download within each category. 
-				If you can't find something, contact the Board.
-			</p>
+	<section id="records-request" class="mt-12 p-8 bg-blue-50 rounded-2xl border border-blue-100">
+		<div class="flex flex-col md:flex-row items-start justify-between gap-6 mb-8">
+			<div class="max-w-2xl">
+				<h2 class="text-2xl font-bold text-blue-900 mb-3">Need a specific document?</h2>
+				<p class="text-blue-800/80 mb-4 leading-relaxed">
+					Documents that are publicly recorded or community policies are available on this site. However, association records governed by <strong>Civil Code § 5200</strong> should be retrieved via the official HOA portal or by requesting a copy directly from management.
+				</p>
+			</div>
+			<div class="bg-white p-4 rounded-lg shadow-sm border border-blue-100 text-blue-900 font-medium whitespace-nowrap">
+				Latest Update: April 2026
+			</div>
 		</div>
-		<div class="bg-white p-4 rounded-lg shadow-sm border border-blue-100 text-blue-900 font-medium">
-			Latest Update: April 2026
+
+		<div class="bg-white rounded-xl p-6 border border-blue-100 shadow-sm">
+			<h3 class="font-bold text-blue-900 mb-3 flex items-center gap-2">
+				<span>🏛️</span> Records Requestable Under the Davis-Stirling Act
+			</h3>
+			<p class="text-sm text-slate-600 mb-4">Under Civil Code § 5200, members have the right to inspect and copy various association records, including but not limited to:</p>
+			<ul class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm text-slate-700 list-disc list-inside ml-4">
+				<li>Financial documents (budgets, audits, tax returns)</li>
+				<li>Executed contracts (management, landscaping, etc.)</li>
+				<li>Board meeting minutes (excluding executive sessions)</li>
+				<li>Membership lists (subject to opt-outs and restrictions)</li>
+				<li>Governing documents (CC&Rs, Bylaws, Articles)</li>
+				<li>Reserve studies and funding plans</li>
+				<li>Insurance policies and certificates</li>
+			</ul>
 		</div>
 	</section>
 </BaseLayout>
