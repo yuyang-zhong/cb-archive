@@ -189,7 +189,7 @@ const projectionScenarios = [
 		<section aria-labelledby="operating-performance">
 			<div class="border-b border-slate-200 pb-3 mb-6">
 				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Operating performance</p>
-				<h2 id="operating-performance" class="text-2xl font-bold text-slate-950">Startup-year surplus is compressing as operations mature</h2>
+				<h2 id="operating-performance" class="text-2xl font-bold text-slate-950">2025 was an appropriate partial startup year; 2026 is the first full 12-month model</h2>
 			</div>
 
 			<div class="grid lg:grid-cols-[1.25fr_0.75fr] gap-6">
@@ -200,7 +200,7 @@ const projectionScenarios = [
 						</thead>
 						<tbody class="divide-y divide-slate-100 text-slate-700">
 							<tr>
-								<td class="px-5 py-4"><p class="font-bold text-slate-950">June–December 2025 actual</p><p class="text-xs text-slate-500 mt-1">Seven operating months; January–May show no activity.</p></td>
+								<td class="px-5 py-4"><p class="font-bold text-slate-950">2025 startup actual</p><p class="text-xs text-slate-500 mt-1">The Association became operational around May; the statements and budget use seven operating months from June through December.</p></td>
 								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.revenue2025)}</td>
 								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.expenses2025)}</td>
 								<td class="px-5 py-4 text-right whitespace-nowrap font-extrabold text-emerald-700">+{currency(reported.netIncome2025)}</td>
@@ -220,7 +220,7 @@ const projectionScenarios = [
 						</tbody>
 					</table>
 					<div class="p-5 border-t border-slate-200 bg-blue-50 text-xs text-blue-950/75 leading-relaxed">
-						<strong>Interpretation:</strong> The {currency(reported.netIncome2025)} result is a seven-month startup-period surplus, not a normal 12-month earnings level. Q1 monthly revenue stayed near the startup average, while the expense pace increased. Favorable expense timing is currently carrying the break-even budget despite the submeter-revenue shortfall.
+						<strong>Interpretation:</strong> A seven-month model is appropriate for 2025 because the Association began operations late in the year. The {currency(reported.netIncome2025)} result should be evaluated as a valid partial-year startup result—not annualized or compared directly with a full 12-month year. The 2026 analysis instead uses the full-year budget and compares Q1 with that 12-month operating model.
 					</div>
 				</div>
 
@@ -329,8 +329,8 @@ const projectionScenarios = [
 			<div class="grid md:grid-cols-2 gap-5">
 				<div class="rounded-2xl border border-rose-200 bg-rose-50 p-6">
 					<p class="text-xs font-bold uppercase tracking-wider text-rose-700">2026 operating budget exhibit</p>
-					<h3 class="text-lg font-bold text-rose-950 mt-2">Wrong year and seven-month “annual” totals</h3>
-					<p class="text-sm text-rose-900/80 mt-3 leading-relaxed">The November 2025 cover identifies fiscal 2026, but Exhibit A is titled 2025 and prints {currency(reported.annualTotalPrintedInBudgetExhibit, 0)} as annual revenue and expense. Its {currency(88_035.12)} monthly total multiplied by seven equals that annual column. The 2026 statements instead use a 12-month annual budget of {currency(reported.annualBudgetUsedInStatements, 0)}. Management should identify the board-adopted 12-month pro forma and distribute a corrected exhibit.</p>
+					<h3 class="text-lg font-bold text-rose-950 mt-2">A valid 2025 partial-year exhibit was reused for full-year 2026</h3>
+					<p class="text-sm text-rose-900/80 mt-3 leading-relaxed">The {currency(reported.partialYearTotalPrintedInBudgetExhibit, 0)} total is appropriate for 2025: it equals seven startup months at approximately {currency(88_035.12)} per month. The problem is its inclusion, still labeled 2025, in the packet whose cover identifies fiscal 2026. The 2026 statements correctly use a full 12-month annual budget of {currency(reported.annualBudgetUsedInStatements, 0)}. Management should identify and distribute the board-adopted 12-month 2026 exhibit.</p>
 				</div>
 
 				<div class="rounded-2xl border border-rose-200 bg-rose-50 p-6">
@@ -339,10 +339,10 @@ const projectionScenarios = [
 					<p class="text-sm text-rose-900/80 mt-3 leading-relaxed">The 2026 letter says an on-site study was performed in 2024 and an accounting update in 2025. The attached reserve pages are instead a preconstruction DRE budget worksheet dated April 24, 2023 and revised November 27, 2023. They calculate an annual contribution, but do not show accumulated cash, fully funded balance, percent funded, inflation and interest assumptions, or a 30-year cash-flow projection.</p>
 				</div>
 
-				<div class="rounded-2xl border border-amber-200 bg-amber-50 p-6">
-					<p class="text-xs font-bold uppercase tracking-wider text-amber-700">2025 packet status</p>
-					<h3 class="text-lg font-bold text-amber-950 mt-2">Cover dates and effective dates conflict</h3>
-					<p class="text-sm text-amber-900/80 mt-3 leading-relaxed">The October 14, 2025 packet is labeled fiscal 2025 but states that assessments remain unchanged effective January 1, 2026. It also describes {currency(248_713.76)} as estimated accumulated reserves, although that figure is the DRE worksheet's annual general-reserve contribution and December's actual reserve balance was {currency(149_561.60)}. The board record should identify which packet was adopted and which was superseded.</p>
+				<div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
+					<p class="text-xs font-bold uppercase tracking-wider text-emerald-700">2025 model treatment</p>
+					<h3 class="text-lg font-bold text-emerald-950 mt-2">Seven months is the right scale for the startup year</h3>
+					<p class="text-sm text-emerald-900/80 mt-3 leading-relaxed">The Association began generating operating activity around May 2025, and the financial packages model seven operating months from June through December. The {currency(616_245)} break-even budget and {currency(149_561.60)} of scheduled reserve funding therefore represent the intended partial-year period. They should not be stretched into a 12-month 2025 comparison.</p>
 				</div>
 
 				<div class="rounded-2xl border border-blue-200 bg-blue-50 p-6">

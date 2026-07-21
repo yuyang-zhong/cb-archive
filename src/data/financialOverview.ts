@@ -23,7 +23,7 @@ export const financialOverview = {
     ],
     annualBudgetUsedInStatements: 1_056_422,
     monthlyBudgetUsedInStatements: 88_035.16,
-    annualTotalPrintedInBudgetExhibit: 616_245,
+    partialYearTotalPrintedInBudgetExhibit: 616_245,
     totalAssets: 358_999.09,
     operatingBankCash: 158_451.82,
     unrestrictedOperatingCash: 30_256.14,

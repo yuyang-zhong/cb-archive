@@ -49,6 +49,8 @@ Keep these dates separate:
 
 Do not treat a newer file as approved merely because it exists. Confirm its status from the user, board record, or approved minutes. Always disclose a reporting lag.
 
+The verified 2025 baseline is a special partial-year case: the Association became operational around May, and the budget and statements use seven operating months from June through December. That seven-month model is appropriate for 2025. Do not annualize it or criticize it for not covering 12 months. Beginning in 2026, use a full 12-month budget and reporting model.
+
 ## Review workflow
 
 ### 1. Inventory the new records
@@ -188,12 +190,12 @@ The following figures were verified to the March 31, 2026 package during the Jul
 
 Other baseline facts:
 
-- The 2025 statements cover seven operating months, June through December, and report $134,643.52 of net income before later equity adjustments.
+- The Association became operational around May 2025. Its budget and statements appropriately model seven operating months from June through December and report $134,643.52 of net income before later equity adjustments.
 - March 2026 alone reports a $5,905.42 loss.
 - The reserve total consists of 40.0% reserve-bank cash and 60.0% due from operating.
 - The March closing log shows 129 of 148 units closed. The July 20 update shows 143 closed and five remaining.
 - The 2026 statements use a 12-month, break-even annual budget of $1,056,422.
-- The supplied 2026 packet's Exhibit A is labeled 2025 and prints $616,245 of “annual” revenue and expense, which equals seven months of its monthly total.
+- The $616,245 Exhibit A total is appropriate for the seven-month 2025 startup period. The document-control issue is that this 2025 partial-year exhibit was reused inside the 2026 packet even though 2026 is a full 12-month year.
 - The supplied reserve worksheet is dated April 24, 2023, revised November 27, 2023, and is a DRE preconstruction estimate.
 - The 2026 budget letter references a 2024 on-site reserve study and a 2025 accounting update, but those studies were not among the files reviewed.
 
