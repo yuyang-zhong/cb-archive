@@ -1,529 +1,485 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { derivedFinancials, financialOverview } from '../../data/financialOverview';
+
+const { reported, units, watchItems, sourceDocuments, asOf, reviewedOn } = financialOverview;
+
+const currency = (value: number, digits = 2) =>
+	new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency: 'USD',
+		minimumFractionDigits: digits,
+		maximumFractionDigits: digits,
+	}).format(value);
+
+const percent = (value: number, digits = 1) =>
+	new Intl.NumberFormat('en-US', {
+		style: 'percent',
+		minimumFractionDigits: digits,
+		maximumFractionDigits: digits,
+	}).format(value);
+
+const priorityClass = (priority: string) => {
+	if (priority === 'High') return 'bg-rose-100 text-rose-700 border-rose-200';
+	if (priority === 'Medium') return 'bg-amber-100 text-amber-700 border-amber-200';
+	return 'bg-slate-100 text-slate-700 border-slate-200';
+};
+
+const projectionScenarios = [
+	{
+		name: 'Q1 pace repeats',
+		assumption: 'Each remaining quarter repeats the Q1 average',
+		revenue: derivedFinancials.annualRevenueAtQ1Pace,
+		expenses: derivedFinancials.annualExpensesAtQ1Pace,
+	},
+	{
+		name: 'Budget for April–December',
+		assumption: 'Keep Q1 actuals; both revenue and expense return to monthly budget',
+		revenue: derivedFinancials.budgetRemainderRevenue,
+		expenses: derivedFinancials.budgetRemainderExpenses,
+	},
+	{
+		name: '5% remaining revenue stress',
+		assumption: 'Keep Q1 actuals; April–December revenue is 5% below budget and expense is on budget',
+		revenue: derivedFinancials.budgetRemainderRevenueStress,
+		expenses: derivedFinancials.budgetRemainderExpenses,
+	},
+	{
+		name: 'March pace continues',
+		assumption: 'April–December repeat March revenue and expense',
+		revenue: derivedFinancials.marchPaceRevenue,
+		expenses: derivedFinancials.marchPaceExpenses,
+	},
+].map(scenario => ({ ...scenario, result: scenario.revenue - scenario.expenses }));
 ---
 
-<BaseLayout title="Financial Overview">
-	<div class="mb-12">
-		<h1 class="text-4xl font-extrabold text-slate-900 mb-4">Financial Overview</h1>
-		<p class="text-lg text-slate-600 max-w-3xl">
-			Transparent access to our community's financial health. We translate complex HOA financial documents into clear, easy-to-understand takeaways.
+<BaseLayout
+	title="Financial Position Review"
+	description={`Source-verified review of China Basin HOA financial information through ${asOf}.`}
+>
+	<header class="mb-10 max-w-4xl">
+		<div class="flex flex-wrap items-center gap-3 mb-4">
+			<span class="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">Reviewed {reviewedOn}</span>
+			<span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-700">Approved statements through {asOf}</span>
+			<span class="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-800">Independent review · not an audit</span>
+		</div>
+		<h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-950 mb-4">Financial position review</h1>
+		<p class="text-lg text-slate-600 leading-relaxed">
+			A source-checked accounting, data, and community-association review of the June 2025–March 2026 statements, the budget packets, and the reserve materials supplied for this project.
 		</p>
-	</div>
+	</header>
 
 	<div class="space-y-12">
-		<!-- Health Indicator & Overall Recommendation -->
-		<section class="bg-blue-50 rounded-3xl p-8 border border-blue-100 shadow-sm relative overflow-hidden">
-			<!-- Decorative background element -->
-			<div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 pointer-events-none"></div>
-			
-			<div class="relative z-10 flex flex-col md:flex-row gap-8 items-start md:items-center">
-				<div class="flex-shrink-0 bg-white p-6 rounded-2xl shadow-sm border border-blue-100 text-center md:w-48">
-					<div class="text-5xl mb-2">🌟</div>
-					<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Overall Rating</div>
-					<div class="text-xl font-bold text-green-600">Very Healthy</div>
-				</div>
-				
-				<div class="flex-grow">
-					<h2 class="text-2xl font-bold text-blue-900 mb-3">Strong Footing for the Future</h2>
-					<p class="text-blue-900 mb-5 text-lg leading-relaxed">Owners are inheriting a very healthy, heavily funded Association. Homeowners should continue to break down their boxes (to prevent a repeat of 2025's $400+ emergency trash chute calls) and monitor "Elevator Extras" to ensure the brand-new elevators aren't developing chronic issues outside of their warranty and standard maintenance contracts.</p>
-					
-					<div class="flex flex-wrap gap-4">
-						<div class="bg-white/70 rounded-xl px-4 py-3 border border-blue-200/60 flex items-center gap-3 shadow-sm">
-							<div class="bg-green-100 text-green-600 rounded-full w-8 h-8 flex items-center justify-center font-bold">✓</div>
-							<div>
-								<span class="block text-xs font-semibold text-blue-800 uppercase">2026 Assessments</span>
-								<span class="block font-bold text-blue-900">Remaining Stable</span>
-							</div>
-						</div>
-						<div class="bg-white/70 rounded-xl px-4 py-3 border border-blue-200/60 flex items-center gap-3 shadow-sm">
-							<div class="bg-green-100 text-green-600 rounded-full w-8 h-8 flex items-center justify-center font-bold">✓</div>
-							<div>
-								<span class="block text-xs font-semibold text-blue-800 uppercase">Reserves Funding</span>
-								<span class="block font-bold text-blue-900">Strong Allocation</span>
-							</div>
-						</div>
-					</div>
-				</div>
+		<section class="rounded-2xl border border-amber-300 bg-amber-50 p-5 md:flex md:items-start md:justify-between md:gap-8" aria-labelledby="reporting-lag">
+			<div class="max-w-3xl">
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-amber-700 mb-1">Reporting lag</p>
+				<h2 id="reporting-lag" class="text-lg font-bold text-amber-950">It is July, but March is still the latest approved statement</h2>
+				<p class="text-sm text-amber-900/80 leading-relaxed mt-2">April, May, and June actual results remain unreported, and July is still in progress. The projections below are comparison models—not reported results—and should be replaced when the missing monthly packages are approved.</p>
 			</div>
-
-			<!-- Independent Analysis Note -->
-			<div class="mt-8 pt-6 border-t border-blue-200/50 relative z-10">
-				<p class="text-xs text-blue-800/60 italic leading-relaxed">
-					<strong class="text-blue-900/80">Note:</strong> This analysis is independently conducted to ingest association financial statements and budgets for community transparency.
-				</p>
+			<div class="mt-4 md:mt-0 md:text-right flex-shrink-0">
+				<p class="text-3xl font-extrabold text-amber-900">3 months</p>
+				<p class="text-xs font-semibold uppercase tracking-wider text-amber-700">of closed activity pending</p>
 			</div>
 		</section>
 
-		<!-- VISUAL AIDS FOR INCOME & SPENDING -->
-		<section>
-			<h2 class="text-2xl font-bold text-slate-900 border-b pb-2 mb-6">2025 Year-in-Review & Q1 2026 Liquidity Update</h2>
-			<div class="grid lg:grid-cols-2 gap-6">
-				
-				<!-- 2025 Wrap-Up Card -->
-				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col">
-					<h3 class="text-lg font-bold text-slate-900 mb-3">2025 Closed Strong</h3>
-					<div class="text-3xl font-extrabold text-green-600 mb-3">$134,643.52</div>
-					<p class="text-sm text-slate-600 leading-relaxed">The HOA finished its 2025 fiscal year in an excellent position, boasting a final net income of <strong>$134,643.52</strong>.</p>
+		<section class="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-blue-50 p-6 md:p-8 shadow-sm">
+			<div class="grid gap-8 lg:grid-cols-[1.15fr_1fr] lg:items-start">
+				<div>
+					<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-3">Professional assessment</p>
+					<h2 class="text-2xl md:text-3xl font-extrabold text-slate-950 mb-4">Mixed condition: positive reported earnings, but thin operating cash and material control follow-ups</h2>
+					<p class="text-slate-700 leading-relaxed mb-4">
+						Q1 closed with a {currency(reported.q1Surplus)} surplus because the {currency(derivedFinancials.q1ExpenseVariance)} favorable expense variance exceeded the {currency(Math.abs(derivedFinancials.q1RevenueVariance))} revenue shortfall. That is a real positive result, but March alone lost {currency(Math.abs(reported.monthlyResultsQ1[2].result))}, and operating equity declined during Q1 after a {currency(reported.currentYearAdjustment)} prior-period adjustment.
+					</p>
+					<p class="text-sm text-slate-600 leading-relaxed">
+						The strongest immediate concern is liquidity: after recognizing the amount owed by operating to reserves, only {currency(reported.unrestrictedOperatingCash)} remains as unrestricted operating cash—about {derivedFinancials.operatingCashMonths.toFixed(1)} months of the Q1 nonreserve expense pace.
+					</p>
 				</div>
 
-				<!-- Q1 2026 Run Rate Card -->
-				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col">
-					<h3 class="text-lg font-bold text-slate-900 mb-3 flex justify-between items-end">
-						<span>Q1 2026 Surplus</span>
-						<span class="text-2xl text-green-700">+$11,950.19</span>
-					</h3>
-					<p class="text-sm text-slate-600 leading-relaxed mb-4">Through the first three months of 2026, the HOA is running a healthy surplus. Total operating expenses for the quarter were <strong>$219,383.20</strong>, which is over <strong>$44,000 under the anticipated budget</strong>.</p>
-					
-					<div class="mt-auto border-t pt-4">
-						<div class="flex justify-between text-sm font-semibold mb-1">
-							<span class="text-slate-700">Current Assets (As of March 31, 2026)</span>
-							<span class="text-blue-700">$358,999.09</span>
-						</div>
-						<p class="text-xs text-slate-500">The Association's total assets stand at a highly robust level.</p>
+				<div class="grid sm:grid-cols-2 gap-3" aria-label="Financial condition by area">
+					<div class="rounded-2xl border border-amber-200 bg-white p-4">
+						<span class="text-xs font-bold uppercase tracking-wider text-amber-700">Operations</span>
+						<p class="text-lg font-extrabold text-slate-950 mt-1">Mixed</p>
+						<p class="text-xs text-slate-500 mt-1">Positive Q1; March deficit and revenue below budget.</p>
 					</div>
-				</div>
-
-				<!-- Savings Card -->
-				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center text-center">
-					<div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-blue-100 shadow-sm">
-						🏦
+					<div class="rounded-2xl border border-rose-200 bg-white p-4">
+						<span class="text-xs font-bold uppercase tracking-wider text-rose-700">Liquidity</span>
+						<p class="text-lg font-extrabold text-slate-950 mt-1">Thin</p>
+						<p class="text-xs text-slate-500 mt-1">Only {derivedFinancials.operatingCashMonths.toFixed(1)} months of nonreserve expense pace.</p>
 					</div>
-					<h3 class="text-lg font-bold text-slate-900 mb-2">Saving for the Future</h3>
-					<div class="text-3xl font-extrabold text-blue-600 mb-3">$128,195.68</div>
-					<p class="text-sm text-slate-600 leading-relaxed px-4 mb-3">Total recognized reserve balance as of March. The Association faithfully transfers <strong>$21,365.92</strong> into reserve accounts each month.</p>
-					<div class="bg-blue-50 text-blue-800 text-xs font-medium px-3 py-2 rounded-lg inline-block text-left">
-						<strong>Note:</strong> Management is currently holding about $124,000 of these reserve funds in the operating account and is in the process of officially transferring the cash to the dedicated Reserve bank account.
+					<div class="rounded-2xl border border-amber-200 bg-white p-4">
+						<span class="text-xs font-bold uppercase tracking-wider text-amber-700">Reserves</span>
+						<p class="text-lg font-extrabold text-slate-950 mt-1">Not rateable</p>
+						<p class="text-xs text-slate-500 mt-1">The current study and funded percentage were not supplied.</p>
+					</div>
+					<div class="rounded-2xl border border-rose-200 bg-white p-4">
+						<span class="text-xs font-bold uppercase tracking-wider text-rose-700">Reporting controls</span>
+						<p class="text-lg font-extrabold text-slate-950 mt-1">Needs correction</p>
+						<p class="text-xs text-slate-500 mt-1">Budget exhibits, suspense, and stale checks require resolution.</p>
+					</div>
 					</div>
 				</div>
 
-				<!-- Spending Summary Card (Q1 2026 Monthly Averages) -->
-				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col lg:col-span-2">
-					<div class="mb-5">
-						<h3 class="text-xl font-bold text-slate-900 mb-2">Key Spending Categories (Q1 2026 Monthly Averages)</h3>
-						<p class="text-sm text-slate-600 leading-relaxed">
-							First-time homeowners need to understand the difference between the HOA's stable, contracted monthly burn rate and the variable expenses that fluctuate based on building usage and repairs. Here is where the money is going, based on the first three months of 2026:
-						</p>
+				<div class="mt-8 border-t border-slate-200 pt-8" aria-labelledby="board-transition-brief">
+					<div class="mb-5 max-w-4xl">
+						<p class="text-xs font-bold uppercase tracking-[0.18em] text-indigo-700 mb-2">Incoming owner-seated board</p>
+						<h3 id="board-transition-brief" class="text-xl md:text-2xl font-extrabold text-slate-950">Key takeaways and post-election transition priorities</h3>
+						<p class="text-sm text-slate-600 leading-relaxed mt-3">With developer control ending after the election, the first owner-seated board should treat its initial 60–90 days as a formal financial, records, and operational turnover—not merely the next routine board cycle.</p>
 					</div>
-					
-					<div class="grid md:grid-cols-2 gap-8">
-						<!-- Fixed Contracts -->
-						<div>
-							<h4 class="font-bold text-blue-900 border-b border-slate-200 pb-2 mb-3">Fixed/Contracted Expenses (The Stable Burn Rate)</h4>
-							<p class="text-xs text-slate-500 mb-4 leading-relaxed">These are the predictable, recurring monthly bills that keep the building insured, managed, and legally compliant:</p>
-							<ul class="space-y-4 text-sm text-slate-700">
-								<li class="flex justify-between items-start border-b border-slate-50 pb-2">
-									<div class="pr-4">
-										<span class="font-semibold block text-slate-800">Reserve Savings</span>
-										<span class="text-xs text-slate-500 block mt-1">Faithfully transferred into our dedicated savings account.</span>
-									</div>
-									<span class="font-bold text-slate-900 whitespace-nowrap">$21,374.00</span>
-								</li>
-								<li class="flex justify-between items-start border-b border-slate-50 pb-2">
-									<div class="pr-4">
-										<span class="font-semibold block text-slate-800">Insurance</span>
-										<span class="text-xs text-slate-500 block mt-1">Amortized portion of our $143,885 annual premium.</span>
-									</div>
-									<span class="font-bold text-slate-900 whitespace-nowrap">$12,021.08</span>
-								</li>
-								<li class="flex justify-between items-start border-b border-slate-50 pb-2">
-									<div class="pr-4">
-										<span class="font-semibold block text-slate-800">Management Contract</span>
-										<span class="text-xs text-slate-500 block mt-1">Paid to Action Property Management.</span>
-									</div>
-									<span class="font-bold text-slate-900 whitespace-nowrap">$6,000.00</span>
-								</li>
-								<li class="flex justify-between items-start border-b border-slate-50 pb-2">
-									<div class="pr-4">
-										<span class="font-semibold block text-slate-800">Janitorial Contract</span>
-										<span class="text-xs text-slate-500 block mt-1">Standard building cleaning services.</span>
-									</div>
-									<span class="font-bold text-slate-900 whitespace-nowrap">$5,816.42</span>
-								</li>
-								<li class="flex justify-between items-start border-b border-slate-50 pb-2">
-									<div class="pr-4">
-										<span class="font-semibold block text-slate-800">Elevator Contract</span>
-										<span class="text-xs text-slate-500 block mt-1">Standard maintenance with Otis Elevator Company.</span>
-									</div>
-									<span class="font-bold text-slate-900 whitespace-nowrap">$1,701.20</span>
-								</li>
-								<li class="flex justify-between items-start pb-2">
-									<div class="pr-4">
-										<span class="font-semibold block text-slate-800">Landscape Contract</span>
-										<span class="text-xs text-slate-500 block mt-1">Standard groundskeeping with BrightView Landscape Services.</span>
-									</div>
-									<span class="font-bold text-slate-900 whitespace-nowrap">$1,530.00</span>
-								</li>
+
+					<div class="grid lg:grid-cols-2 gap-5">
+						<div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 md:p-6">
+							<h4 class="font-extrabold text-indigo-950 mb-4">Key takeaways for incoming directors</h4>
+							<ul class="space-y-3 text-sm text-indigo-950/80">
+								<li class="flex gap-3"><span class="font-black text-indigo-600">01</span><span><strong class="text-indigo-950">Reported income is not available cash.</strong> The Q1 surplus is positive, but unrestricted operating cash is only {currency(reported.unrestrictedOperatingCash)} after the reserve obligation.</span></li>
+								<li class="flex gap-3"><span class="font-black text-indigo-600">02</span><span><strong class="text-indigo-950">Most reserves are not in the reserve bank.</strong> {currency(reported.reserveDueFromOperating)}—{percent(derivedFinancials.reserveInterfundShare)} of the reserve fund—remains an interfund receivable.</span></li>
+								<li class="flex gap-3"><span class="font-black text-indigo-600">03</span><span><strong class="text-indigo-950">The board will inherit a reporting backlog.</strong> April through June statements are still pending while operating costs and occupancy continue to change.</span></li>
+								<li class="flex gap-3"><span class="font-black text-indigo-600">04</span><span><strong class="text-indigo-950">The governing financial record set needs repair.</strong> The supplied budget exhibits conflict with the statements, and the referenced current reserve study was not provided.</span></li>
+								<li class="flex gap-3"><span class="font-black text-indigo-600">05</span><span><strong class="text-indigo-950">Developer closeout evidence must be preserved.</strong> Billing adjustments, warranties, open construction items, vendor claims, and responsibility for early-life repairs should be resolved before institutional knowledge is lost.</span></li>
 							</ul>
 						</div>
 
-						<!-- Variable Expenditures -->
-						<div>
-							<h4 class="font-bold text-orange-900 border-b border-slate-200 pb-2 mb-3">Variable & Additional Expenditures (The Fluctuating Costs)</h4>
-							<p class="text-xs text-slate-500 mb-4 leading-relaxed">These categories represent utilities and out-of-scope maintenance that spiked in early 2026. The amounts below represent the average monthly spend over the first quarter:</p>
-							<ul class="space-y-4 text-sm text-slate-700">
-								<li class="flex justify-between items-start border-b border-slate-50 pb-2">
-									<div class="pr-4">
-										<span class="font-semibold block text-slate-800">Expected Net Utilities <span class="font-normal text-xs">(Water, Electricity, Refuse)</span></span>
-										<span class="text-xs text-slate-500 block mt-1">Our gross utility bills currently average $21,268.06 per month. However, residents directly reimburse the HOA for individual water submetering. While early 2026 collections are lagging due to rollouts and unsold units, the fully occupied budgeted reimbursement is $15,855.25 per month. When fully realized, this drops the true expected net utility cost to the HOA to just $5,412.81 a month.</span>
-									</div>
-									<span class="font-bold text-slate-900 whitespace-nowrap">$5,412.81</span>
-								</li>
-								<li class="flex justify-between items-start border-b border-slate-50 pb-2">
-									<div class="pr-4">
-										<span class="font-semibold block text-slate-800">Elevator Repairs & Extras</span>
-										<span class="text-xs text-slate-500 block mt-1">This reflects a massive $7,478.00 in unbudgeted, out-of-scope elevator repairs and extras in Q1.</span>
-									</div>
-									<span class="font-bold text-slate-900 whitespace-nowrap">$2,492.67</span>
-								</li>
-								<li class="flex justify-between items-start border-b border-slate-50 pb-2">
-									<div class="pr-4">
-										<span class="font-semibold block text-slate-800">Access Control & Security</span>
-										<span class="text-xs text-slate-500 block mt-1">Driven by $2,666.37 in YTD vendor dispatch and monitoring fees.</span>
-									</div>
-									<span class="font-bold text-slate-900 whitespace-nowrap">$888.79</span>
-								</li>
-								<li class="flex justify-between items-start border-b border-slate-50 pb-2">
-									<div class="pr-4">
-										<span class="font-semibold block text-slate-800">Janitorial Extras & Supplies</span>
-										<span class="text-xs text-slate-500 block mt-1">Driven by $2,363.95 in unbudgeted extra trash pull-outs and supply restocks.</span>
-									</div>
-									<span class="font-bold text-slate-900 whitespace-nowrap">$787.98</span>
-								</li>
-								<li class="flex justify-between items-start pb-2">
-									<div class="pr-4">
-										<span class="font-semibold block text-slate-800">Plumbing & Sewer Repairs</span>
-										<span class="text-xs text-slate-500 block mt-1">Driven by $2,314.62 in early 2026 vendor calls for pipe and sewer line clearing.</span>
-									</div>
-									<span class="font-bold text-slate-900 whitespace-nowrap">$771.54</span>
-								</li>
-							</ul>
+						<div class="rounded-2xl border border-blue-200 bg-white p-5 md:p-6 shadow-sm">
+							<h4 class="font-extrabold text-slate-950 mb-4">Proposed action items</h4>
+							<ol class="space-y-3 text-sm text-slate-600">
+								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">First meeting · Secure control.</strong> Confirm officers, bank signers, approval limits, and direct board access to every operating, reserve, payment, accounting, insurance, and owner-record system. Access should not depend solely on management or former developer representatives.</li>
+								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">First meeting · Accept a documented turnover inventory.</strong> Require bank reconciliations, general ledgers, receivable and payable aging, open checks, tax and CPA files, contracts, insurance, warranties, claims, reserve records, minutes, and a list of unresolved developer obligations with accountable owners and due dates.</li>
+								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 30 days · Establish the true cash position.</strong> Resolve the reserve interfund balance, suspense debit, stale insurance check, and developer-billing adjustment; adopt a reserve-repayment schedule and a minimum unrestricted operating-cash floor.</li>
+								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 30 days · Restore timely reporting.</strong> Complete April–June packages and begin a recurring monthly review calendar with written explanations for material variances and unreconciled items.</li>
+								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 60 days · Correct the financial plan.</strong> Identify the adopted 12-month 2026 budget, correct the exhibits, obtain the stated 2024/2025 reserve work or commission a current study, and formally review the reserve funding plan.</li>
+								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 90 days · Independent closeout review.</strong> Ask the Association's CPA and counsel to review year-end adjustments, tax and statutory reporting, turnover completeness, contracts, warranty recovery, and any continuing developer obligations.</li>
+							</ol>
 						</div>
 					</div>
+				</div>
+			</section>
+
+		<section aria-labelledby="reported-snapshot">
+			<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 border-b border-slate-200 pb-3 mb-6">
+				<div>
+					<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">March statement snapshot</p>
+					<h2 id="reported-snapshot" class="text-2xl font-bold text-slate-950">The balances, correctly classified</h2>
+				</div>
+				<p class="text-xs text-slate-500 max-w-md md:text-right">Re-footed to the March balance sheet and income statement.</p>
+			</div>
+
+			<div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+				<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+					<p class="text-xs font-bold uppercase tracking-wider text-slate-500">Q1 reported surplus</p>
+					<p class="text-3xl font-extrabold text-emerald-700 mt-2">{currency(reported.q1Surplus)}</p>
+					<p class="text-xs text-slate-500 mt-3 leading-relaxed">A {percent(derivedFinancials.q1OperatingMargin)} margin before resolution of the suspense item.</p>
+				</div>
+				<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+					<p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total assets</p>
+					<p class="text-3xl font-extrabold text-blue-700 mt-2">{currency(reported.totalAssets)}</p>
+					<p class="text-xs text-slate-500 mt-3 leading-relaxed">Includes restricted reserves and {currency(reported.prepaidExpenses)} of prepaids; it is not freely spendable cash.</p>
+				</div>
+				<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+					<p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total reserve fund</p>
+					<p class="text-3xl font-extrabold text-blue-700 mt-2">{currency(reported.reserveFundBalance)}</p>
+					<p class="text-xs text-slate-500 mt-3 leading-relaxed">The prior {currency(reported.reserveDueFromOperating)} figure was not the total reserve balance; it is the interfund receivable.</p>
+				</div>
+				<div class="rounded-2xl border border-rose-200 bg-rose-50 p-5 shadow-sm">
+					<p class="text-xs font-bold uppercase tracking-wider text-rose-700">Unrestricted operating cash</p>
+					<p class="text-3xl font-extrabold text-rose-800 mt-2">{currency(reported.unrestrictedOperatingCash)}</p>
+					<p class="text-xs text-rose-900/70 mt-3 leading-relaxed">Operating bank balance after the amount due to reserves is recognized.</p>
 				</div>
 			</div>
 		</section>
 
-		<!-- FINANCIAL VISUALIZATION -->
-		<section>
-			<h2 class="text-2xl font-bold text-slate-900 border-b pb-2 mb-6">Financial Visualization (June 2025 - March 2026)</h2>
-			
-			<!-- Chart Container -->
-			<div class="flex flex-col lg:flex-row gap-6 mb-8">
-				<div class="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-					<h3 class="text-lg font-bold text-slate-900 mb-4 text-center">Monthly Income</h3>
-					<div class="relative w-full h-80">
-						<canvas id="incomeChart"></canvas>
+		<section aria-labelledby="operating-performance">
+			<div class="border-b border-slate-200 pb-3 mb-6">
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Operating performance</p>
+				<h2 id="operating-performance" class="text-2xl font-bold text-slate-950">Startup-year surplus is compressing as operations mature</h2>
+			</div>
+
+			<div class="grid lg:grid-cols-[1.25fr_0.75fr] gap-6">
+				<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+					<table class="w-full min-w-[680px] text-sm">
+						<thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
+							<tr><th class="px-5 py-4 font-bold">Period</th><th class="px-5 py-4 font-bold text-right">Revenue</th><th class="px-5 py-4 font-bold text-right">Expenses</th><th class="px-5 py-4 font-bold text-right">Net</th></tr>
+						</thead>
+						<tbody class="divide-y divide-slate-100 text-slate-700">
+							<tr>
+								<td class="px-5 py-4"><p class="font-bold text-slate-950">June–December 2025 actual</p><p class="text-xs text-slate-500 mt-1">Seven operating months; January–May show no activity.</p></td>
+								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.revenue2025)}</td>
+								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.expenses2025)}</td>
+								<td class="px-5 py-4 text-right whitespace-nowrap font-extrabold text-emerald-700">+{currency(reported.netIncome2025)}</td>
+							</tr>
+							<tr>
+								<td class="px-5 py-4"><p class="font-bold text-slate-950">Q1 2026 actual</p><p class="text-xs text-slate-500 mt-1">January–March.</p></td>
+								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.q1Revenue)}</td>
+								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.q1Expenses)}</td>
+								<td class="px-5 py-4 text-right whitespace-nowrap font-extrabold text-emerald-700">+{currency(reported.q1Surplus)}</td>
+							</tr>
+							<tr class="bg-slate-50">
+								<td class="px-5 py-4"><p class="font-bold text-slate-950">Q1 2026 budget</p><p class="text-xs text-slate-500 mt-1">Break-even budget used by the monthly statements.</p></td>
+								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.q1BudgetRevenue)}</td>
+								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.q1BudgetExpenses)}</td>
+								<td class="px-5 py-4 text-right whitespace-nowrap font-extrabold">{currency(0)}</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="p-5 border-t border-slate-200 bg-blue-50 text-xs text-blue-950/75 leading-relaxed">
+						<strong>Interpretation:</strong> The {currency(reported.netIncome2025)} result is a seven-month startup-period surplus, not a normal 12-month earnings level. Q1 monthly revenue stayed near the startup average, while the expense pace increased. Favorable expense timing is currently carrying the break-even budget despite the submeter-revenue shortfall.
 					</div>
 				</div>
-				<div class="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-					<h3 class="text-lg font-bold text-slate-900 mb-4 text-center">Monthly Expenses</h3>
-					<div class="relative w-full h-80">
-						<canvas id="expenseChart"></canvas>
+
+				<div class="rounded-2xl border border-slate-200 bg-slate-950 text-white p-6 shadow-sm">
+					<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-300 mb-2">Q1 monthly result</p>
+					<div class="space-y-3">
+						{reported.monthlyResultsQ1.map(month => (
+							<div class="flex items-center justify-between gap-4 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3">
+								<span class="text-sm text-slate-300">{month.month}</span>
+								<span class={`font-extrabold ${month.result >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>{month.result >= 0 ? '+' : ''}{currency(month.result)}</span>
+							</div>
+						))}
 					</div>
+					<p class="text-xs text-slate-400 mt-5 leading-relaxed">March's loss coincided with higher common-area and utility costs. One month is not a trend, but it makes a straight-line Q1 forecast optimistic unless later months reverse it.</p>
 				</div>
 			</div>
 
-			<!-- Data Table -->
-			<div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
-				<table class="w-full text-sm text-left whitespace-nowrap">
-					<thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200">
-						<tr>
-							<th class="px-6 py-4 font-bold">Month</th>
-							<th class="px-6 py-4 font-bold bg-green-50/50">Total Income</th>
-							<th class="px-6 py-4 text-slate-500">Member Dues</th>
-							<th class="px-6 py-4 text-slate-500">Developer Dues</th>
-							<th class="px-6 py-4 font-bold bg-rose-50/50">Total Expenses</th>
-							<th class="px-6 py-4 text-slate-500">Mgmt/Admin</th>
-							<th class="px-6 py-4 text-slate-500">Maintenance</th>
-							<th class="px-6 py-4 text-slate-500">Elevator</th>
-							<th class="px-6 py-4 text-slate-500">Utilities</th>
-							<th class="px-6 py-4 text-slate-500">Insurance</th>
-							<th class="px-6 py-4 text-slate-500">Reserves</th>
-						</tr>
+			<div class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950 leading-relaxed">
+				<strong>Equity bridge:</strong> Q1 net income was positive, yet operating equity fell from {currency(derivedFinancials.operatingEquityAt2025YearEnd)} at December 31 to {currency(derivedFinancials.operatingEquityAtQ1End)} at March 31. The reason is a {currency(reported.currentYearAdjustment)} charge to equity, principally a {currency(16_357.24)} “2025 Developer Billing Adjustment,” plus prior-period reclasses. The displayed 2025 net-income line should therefore not be treated as fully settled without the year-end review or audit.
+			</div>
+		</section>
+
+		<section aria-labelledby="cash-reconciliation">
+			<div class="border-b border-slate-200 pb-3 mb-6">
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Liquidity and fund accounting</p>
+				<h2 id="cash-reconciliation" class="text-2xl font-bold text-slate-950">The reserve fund is larger than previously shown—but most of it was still owed by operating</h2>
+			</div>
+
+			<div class="grid lg:grid-cols-[0.9fr_1.1fr] gap-6">
+				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+					<p class="text-xs font-bold uppercase tracking-wider text-slate-500">Operating bank reconciliation</p>
+					<dl class="mt-4 space-y-3 text-sm">
+						<div class="flex justify-between gap-4 border-b border-slate-100 pb-3"><dt class="text-slate-600">Operating bank ledger</dt><dd class="font-bold text-slate-950">{currency(reported.operatingBankCash)}</dd></div>
+						<div class="flex justify-between gap-4 border-b border-slate-100 pb-3"><dt class="text-slate-600">Less: due to reserve funds</dt><dd class="font-bold text-rose-700">({currency(reported.reserveDueFromOperating)})</dd></div>
+						<div class="flex justify-between gap-4"><dt class="font-bold text-slate-950">Unrestricted operating cash</dt><dd class="font-extrabold text-rose-700">{currency(reported.unrestrictedOperatingCash)}</dd></div>
+					</dl>
+					<p class="text-xs text-slate-500 mt-5 leading-relaxed">This is only about {derivedFinancials.operatingCashMonths.toFixed(1)} months of average Q1 expense excluding reserve funding. Adding reported receivables produces {currency(derivedFinancials.liquidOperatingAssets)} of liquid operating assets before collectability adjustments.</p>
+				</div>
+
+				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+					<div class="grid sm:grid-cols-3 gap-4">
+						<div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+							<p class="text-xs font-bold uppercase tracking-wider text-emerald-700">In reserve bank</p>
+							<p class="text-2xl font-extrabold text-emerald-800 mt-2">{currency(reported.reserveBankCash)}</p>
+							<p class="text-xs text-emerald-900/70 mt-1">{percent(derivedFinancials.reserveBankedShare)} of total reserves</p>
+						</div>
+						<div class="rounded-xl border border-rose-200 bg-rose-50 p-4">
+							<p class="text-xs font-bold uppercase tracking-wider text-rose-700">Due from operating</p>
+							<p class="text-2xl font-extrabold text-rose-800 mt-2">{currency(reported.reserveDueFromOperating)}</p>
+							<p class="text-xs text-rose-900/70 mt-1">{percent(derivedFinancials.reserveInterfundShare)} of total reserves</p>
+						</div>
+						<div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
+							<p class="text-xs font-bold uppercase tracking-wider text-blue-700">Total reserve fund</p>
+							<p class="text-2xl font-extrabold text-blue-800 mt-2">{currency(reported.reserveFundBalance)}</p>
+							<p class="text-xs text-blue-900/70 mt-1">Accounting balance, not adequacy</p>
+						</div>
+					</div>
+					<p class="text-xs text-slate-500 mt-5 leading-relaxed">The interfund schedule traces {currency(106_829.60)} to the October 2025 prior-management balance and {currency(42_732)} to unfunded November–December allocations, less a {currency(21_365.92)} February repayment. January–March current contributions did reach the reserve bank; the older balance remains outstanding.</p>
+				</div>
+			</div>
+
+			<div class="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-5 text-sm text-blue-950 leading-relaxed">
+				<strong>Monthly board review:</strong> California Civil Code <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=5500." target="_blank" rel="noreferrer">§ 5500</a> calls for monthly review of operating and reserve reconciliations, bank statements, budget-to-actual results, income and expenses, the check register, general ledger, and delinquency reports. The reserve receivable, suspense debit, and long-outstanding insurance check should each appear in that review until cleared.
+			</div>
+		</section>
+
+		<section aria-labelledby="run-rate-model">
+			<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 border-b border-slate-200 pb-3 mb-6">
+				<div>
+					<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Projection model</p>
+					<h2 id="run-rate-model" class="text-2xl font-bold text-slate-950">A range is more credible than one annualized number</h2>
+				</div>
+				<p class="text-xs text-slate-500 max-w-md md:text-right">Models based on approved January–March actuals. They are not the budget and are not predictions.</p>
+			</div>
+
+			<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+				<table class="w-full min-w-[760px] text-sm">
+					<thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
+						<tr><th class="px-5 py-4 font-bold">Full-year scenario</th><th class="px-5 py-4 font-bold text-right">Revenue</th><th class="px-5 py-4 font-bold text-right">Expenses</th><th class="px-5 py-4 font-bold text-right">Result</th></tr>
 					</thead>
-					<tbody class="divide-y divide-slate-200 text-slate-600" id="financialTableBody">
+					<tbody class="divide-y divide-slate-100 text-slate-700">
+						{projectionScenarios.map(scenario => (
+							<tr class="align-top">
+								<td class="px-5 py-4"><p class="font-bold text-slate-950">{scenario.name}</p><p class="text-xs text-slate-500 mt-1">{scenario.assumption}</p></td>
+								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(scenario.revenue)}</td>
+								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(scenario.expenses)}</td>
+								<td class={`px-5 py-4 text-right whitespace-nowrap font-extrabold ${scenario.result >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{scenario.result >= 0 ? '+' : ''}{currency(scenario.result)}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+				<div class="p-5 border-t border-slate-200 bg-slate-50 text-xs text-slate-600 leading-relaxed"><strong>Reading the range:</strong> The Q1 run-rate case is the optimistic end because it assumes favorable expense timing persists. Returning to budget for the remaining nine months preserves the Q1 surplus. A modest revenue miss or a repeat of March's relationship between revenue and expense produces a deficit.</div>
+			</div>
+
+			<div class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-5 text-xs text-amber-900/80 leading-relaxed">
+				<strong>Projection limits:</strong> The model does not estimate seasonality, catch-up invoices, reserve expenditures, contract changes, utility growth, insurance renewal, delinquency, or warranty recovery. Closings rose from {units.closedAtStatementDate} at March 31 to {units.closedAtReviewDate} at July 20, so occupancy-sensitive utility and reimbursement behavior may already differ from Q1.
+			</div>
+		</section>
+
+		<section aria-labelledby="document-control">
+			<div class="border-b border-slate-200 pb-3 mb-6">
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-rose-700 mb-1">Budget and reserve document control</p>
+				<h2 id="document-control" class="text-2xl font-bold text-slate-950">The supplied packets do not support every statement they make</h2>
+			</div>
+
+			<div class="grid md:grid-cols-2 gap-5">
+				<div class="rounded-2xl border border-rose-200 bg-rose-50 p-6">
+					<p class="text-xs font-bold uppercase tracking-wider text-rose-700">2026 operating budget exhibit</p>
+					<h3 class="text-lg font-bold text-rose-950 mt-2">Wrong year and seven-month “annual” totals</h3>
+					<p class="text-sm text-rose-900/80 mt-3 leading-relaxed">The November 2025 cover identifies fiscal 2026, but Exhibit A is titled 2025 and prints {currency(reported.annualTotalPrintedInBudgetExhibit, 0)} as annual revenue and expense. Its {currency(88_035.12)} monthly total multiplied by seven equals that annual column. The 2026 statements instead use a 12-month annual budget of {currency(reported.annualBudgetUsedInStatements, 0)}. Management should identify the board-adopted 12-month pro forma and distribute a corrected exhibit.</p>
+				</div>
+
+				<div class="rounded-2xl border border-rose-200 bg-rose-50 p-6">
+					<p class="text-xs font-bold uppercase tracking-wider text-rose-700">Reserve study evidence</p>
+					<h3 class="text-lg font-bold text-rose-950 mt-2">The referenced 2024 study and 2025 update are not in the supplied files</h3>
+					<p class="text-sm text-rose-900/80 mt-3 leading-relaxed">The 2026 letter says an on-site study was performed in 2024 and an accounting update in 2025. The attached reserve pages are instead a preconstruction DRE budget worksheet dated April 24, 2023 and revised November 27, 2023. They calculate an annual contribution, but do not show accumulated cash, fully funded balance, percent funded, inflation and interest assumptions, or a 30-year cash-flow projection.</p>
+				</div>
+
+				<div class="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+					<p class="text-xs font-bold uppercase tracking-wider text-amber-700">2025 packet status</p>
+					<h3 class="text-lg font-bold text-amber-950 mt-2">Cover dates and effective dates conflict</h3>
+					<p class="text-sm text-amber-900/80 mt-3 leading-relaxed">The October 14, 2025 packet is labeled fiscal 2025 but states that assessments remain unchanged effective January 1, 2026. It also describes {currency(248_713.76)} as estimated accumulated reserves, although that figure is the DRE worksheet's annual general-reserve contribution and December's actual reserve balance was {currency(149_561.60)}. The board record should identify which packet was adopted and which was superseded.</p>
+				</div>
+
+				<div class="rounded-2xl border border-blue-200 bg-blue-50 p-6">
+					<p class="text-xs font-bold uppercase tracking-wider text-blue-700">Special-assessment statement</p>
+					<h3 class="text-lg font-bold text-blue-950 mt-2">The board said none was anticipated—not that one was impossible</h3>
+					<p class="text-sm text-blue-900/80 mt-3 leading-relaxed">As of the November 2025 budget letter, the board did not anticipate a special assessment for major components or reserve adequacy and expressly said that statement was not a guarantee. Because the referenced reserve study was not supplied, this review cannot independently validate that conclusion. California's disclosure framework appears in Civil Code <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=5300." target="_blank" rel="noreferrer">§ 5300</a>, <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=5550." target="_blank" rel="noreferrer">§ 5550</a>, and <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=5570." target="_blank" rel="noreferrer">§ 5570</a>.</p>
+				</div>
+			</div>
+		</section>
+
+		<section aria-labelledby="accounting-exceptions">
+			<div class="border-b border-slate-200 pb-3 mb-6">
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Accounting exceptions</p>
+				<h2 id="accounting-exceptions" class="text-2xl font-bold text-slate-950">Three items could change how the reported position is understood</h2>
+			</div>
+
+			<div class="grid lg:grid-cols-3 gap-5">
+				<div class="rounded-2xl border border-rose-200 bg-rose-50 p-6">
+					<p class="text-xs font-bold uppercase tracking-wider text-rose-700">Suspense debit</p>
+					<p class="text-3xl font-extrabold text-rose-800 mt-2">{currency(reported.suspenseDebit)}</p>
+					<p class="text-sm text-rose-900/80 mt-3 leading-relaxed">A March CollectBureau bank debit was posted as a negative liability. If it belongs in operating expense, Q1 surplus would fall to {currency(derivedFinancials.adjustedQ1SurplusIfSuspenseIsExpense)}. Support and classification are required before relying on the reported margin.</p>
+				</div>
+
+				<div class="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+					<p class="text-xs font-bold uppercase tracking-wider text-amber-700">Insurance check</p>
+					<p class="text-3xl font-extrabold text-amber-800 mt-2">{currency(reported.unclearedPropertyInsuranceCheck)}</p>
+					<p class="text-sm text-amber-900/80 mt-3 leading-relaxed">The December 1 property-insurance check remained uncleared on the March 31 reconciliation. Confirm coverage and payee status, then void or reissue as necessary while preventing a duplicate payment.</p>
+				</div>
+
+				<div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
+					<p class="text-xs font-bold uppercase tracking-wider text-emerald-700">Insurance amortization</p>
+					<p class="text-3xl font-extrabold text-emerald-800 mt-2">Reconciled</p>
+					<p class="text-sm text-emerald-900/80 mt-3 leading-relaxed">The {currency(reported.insuranceAmortizationMonthly)} monthly amortization agrees to the {currency(reported.insurancePackageTotal)} package: {currency(reported.propertyInsurancePremium)} property plus {currency(reported.workersCompPremium)} workers’ compensation. The earlier “premium mismatch” conclusion was incorrect.</p>
+				</div>
+			</div>
+		</section>
+
+		<section aria-labelledby="revenue-quality">
+			<div class="border-b border-slate-200 pb-3 mb-6">
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Revenue and occupancy</p>
+				<h2 id="revenue-quality" class="text-2xl font-bold text-slate-950">Closings change payer mix and utility behavior</h2>
+			</div>
+
+			<div class="grid lg:grid-cols-3 gap-5">
+				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+					<p class="text-xs font-bold uppercase tracking-wider text-indigo-700">Closing progress</p>
+					<div class="flex items-baseline gap-2 mt-2"><p class="text-3xl font-extrabold text-slate-950">{units.closedAtReviewDate}</p><p class="text-sm text-slate-500">of {units.total} · {percent(derivedFinancials.closingShareAtReviewDate)}</p></div>
+					<p class="text-sm text-slate-600 mt-3 leading-relaxed">Only {derivedFinancials.remainingAtReviewDate} units remained as of July 20. Assessments on unsold units are assessment revenue, not a discretionary subsidy. The payer changes from developer to owner as units close.</p>
+					<p class="text-xs text-slate-500 mt-3 leading-relaxed">The March closing log shows {derivedFinancials.remainingAtStatementDate} units not yet closed. The March ledger billed {currency(reported.marchDeveloperBilling)} and received {currency(reported.marchDeveloperPaymentInTransit)} in transit, with an opening credit explaining the difference.</p>
+				</div>
+
+				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+					<p class="text-xs font-bold uppercase tracking-wider text-cyan-700">Q1 water recovery</p>
+					<p class="text-3xl font-extrabold text-slate-950 mt-2">{currency(derivedFinancials.waterReimbursementsMonthlyAverage)}</p>
+					<p class="text-xs text-slate-500 mt-1">Average monthly reimbursement from {currency(reported.q1WaterReimbursements)} in Q1.</p>
+					<div class="mt-5">
+						<div class="flex justify-between text-xs font-semibold text-slate-600 mb-2"><span>Against monthly budget benchmark</span><span>{percent(derivedFinancials.waterRecoveryAgainstFullOccupancyBudget, 0)}</span></div>
+						<div class="h-2.5 rounded-full bg-slate-100 overflow-hidden" role="img" aria-label={`${percent(derivedFinancials.waterRecoveryAgainstFullOccupancyBudget, 0)} of the monthly water reimbursement budget`}><div class="h-full rounded-full bg-cyan-500" style={`width: ${Math.min(derivedFinancials.waterRecoveryAgainstFullOccupancyBudget * 100, 100)}%`}></div></div>
+					</div>
+					<p class="text-xs text-slate-500 mt-4 leading-relaxed">Submeter revenue was {currency(Math.abs(-33_759.70))} below Q1 budget and explains nearly all of the total revenue shortfall.</p>
+				</div>
+
+				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+					<p class="text-xs font-bold uppercase tracking-wider text-cyan-700">Actual net utilities</p>
+					<p class="text-3xl font-extrabold text-slate-950 mt-2">{currency(derivedFinancials.q1NetUtilitiesMonthlyAverage)}</p>
+					<p class="text-xs text-slate-500 mt-1">Monthly average: {currency(derivedFinancials.grossUtilitiesMonthlyAverage)} gross less {currency(derivedFinancials.waterReimbursementsMonthlyAverage)} reimbursement.</p>
+					<p class="text-sm text-slate-600 mt-4 leading-relaxed">The {currency(derivedFinancials.fullOccupancyIllustrativeNetUtilities)} amount obtained by subtracting the full-budget reimbursement from current gross cost is only an illustration. Usage and cost are likely to rise with occupancy, so it is not a current “true cost.”</p>
+				</div>
+			</div>
+		</section>
+
+		<section aria-labelledby="expense-watchlist">
+			<div class="border-b border-slate-200 pb-3 mb-6">
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Property operations</p>
+				<h2 id="expense-watchlist" class="text-2xl font-bold text-slate-950">Exceptions for invoice-level management</h2>
+			</div>
+
+			<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+				<table class="w-full min-w-[860px] text-sm">
+					<thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
+						<tr><th class="px-5 py-4 font-bold">Priority</th><th class="px-5 py-4 font-bold">Category</th><th class="px-5 py-4 font-bold">Period</th><th class="px-5 py-4 font-bold text-right">Amount</th><th class="px-5 py-4 font-bold">Management response</th></tr>
+					</thead>
+					<tbody class="divide-y divide-slate-100 text-slate-700">
+						{watchItems.map(item => (
+							<tr class="align-top">
+								<td class="px-5 py-4"><span class={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${priorityClass(item.priority)}`}>{item.priority}</span></td>
+								<td class="px-5 py-4"><p class="font-bold text-slate-950">{item.category}</p><p class="text-xs text-slate-500 mt-1">{item.detail}</p></td>
+								<td class="px-5 py-4 whitespace-nowrap">{item.period}</td>
+								<td class="px-5 py-4 font-bold text-slate-950 text-right whitespace-nowrap">{currency(item.amount)}</td>
+								<td class="px-5 py-4 text-xs leading-relaxed max-w-md">{item.action}</td>
+							</tr>
+						))}
 					</tbody>
 				</table>
 			</div>
-			
-			<div class="mt-4 text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-200">
-				<strong>* Note on Developer Subsidization:</strong> Developer dues have been reclassified into member dues starting in November 2025. Developers continue to faithfully pay for unsold units; these payments are now seamlessly merged directly into the main assessment revenue line.
+		</section>
+
+		<section class="rounded-3xl bg-slate-950 text-white p-6 md:p-8" aria-labelledby="management-plan">
+			<div class="grid lg:grid-cols-[0.7fr_1.3fr] gap-8">
+				<div>
+					<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-300 mb-2">Board and management plan</p>
+					<h2 id="management-plan" class="text-2xl md:text-3xl font-extrabold">Six priorities before the next financial review</h2>
+					<p class="text-sm text-slate-300 leading-relaxed mt-4">These items address the highest-value accounting, cash, reserve, and property-management risks found in the source packages.</p>
+				</div>
+				<ol class="grid sm:grid-cols-2 gap-4 text-sm">
+					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">01 · Reporting</span><p class="text-slate-300 mt-2">Approve and release April–June statements with written explanations for material variances and late reporting.</p></li>
+					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">02 · Cash</span><p class="text-slate-300 mt-2">Adopt a documented repayment plan for the {currency(reported.reserveDueFromOperating)} interfund balance and preserve an operating-cash floor.</p></li>
+					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">03 · Exceptions</span><p class="text-slate-300 mt-2">Resolve the CollectBureau suspense debit and the stale insurance check; retain invoice and bank support.</p></li>
+					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">04 · Budget</span><p class="text-slate-300 mt-2">Identify the adopted 2026 budget and reissue a 12-month pro forma with the correct year and annual totals.</p></li>
+					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">05 · Reserves</span><p class="text-slate-300 mt-2">Obtain the stated 2024 on-site study and 2025 update, including percent funded and 30-year cash flow—or commission the current study if they cannot be produced.</p></li>
+					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">06 · Operations</span><p class="text-slate-300 mt-2">Maintain system-level exception logs for elevators, plumbing, access control, and janitorial work, including warranty and developer recovery.</p></li>
+				</ol>
 			</div>
 		</section>
 
-		<script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-		<script is:inline>
-			(function() {
-				const financialData = [
-					{ month: 'Jun 2025', income: { member: 5524, developer: 67692 }, expenses: { admin: 13199, maintenance: 7658, elevator: 0, utilities: 3103, insurance: 0, reserves: 21366 } },
-					{ month: 'Jul 2025', income: { member: 10925, developer: 62591 }, expenses: { admin: 4071, maintenance: 4734, elevator: 0, utilities: 1935, insurance: 0, reserves: 21366 } },
-					{ month: 'Aug 2025', income: { member: 19104, developer: 55178 }, expenses: { admin: 3503, maintenance: 2450, elevator: 6075, utilities: 8766, insurance: 0, reserves: 21366 } },
-					{ month: 'Sep 2025', income: { member: 30507, developer: 42858 }, expenses: { admin: 3500, maintenance: 7825, elevator: 0, utilities: 13835, insurance: 0, reserves: 21366 } },
-					{ month: 'Oct 2025', income: { member: 34259, developer: 39520 }, expenses: { admin: 15000, maintenance: 8072, elevator: 0, utilities: 16778, insurance: 0, reserves: 21366 } },
-					{ month: 'Nov 2025*', income: { member: 72180, developer: 0 }, expenses: { admin: 7500, maintenance: 3350, elevator: 0, utilities: 22150, insurance: 0, reserves: 21366 } },
-					{ month: 'Dec 2025*', income: { member: 87557, developer: 0 }, expenses: { admin: 19603, maintenance: 11064, elevator: 6425, utilities: 30957, insurance: 12021, reserves: 21366 } },
-					{ month: 'Jan 2026', income: { member: 70501, developer: 0 }, expenses: { admin: 17684, maintenance: 2173, elevator: 3402, utilities: 19836, insurance: 11654, reserves: 21368 } },
-					{ month: 'Feb 2026', income: { member: 73080, developer: 0 }, expenses: { admin: 21343, maintenance: 1641, elevator: 0, utilities: 22626, insurance: 12021, reserves: 21375 } },
-					{ month: 'Mar 2026', income: { member: 71716, developer: 0 }, expenses: { admin: 19720, maintenance: 10735, elevator: 9179, utilities: 21343, insurance: 12021, reserves: 21383 } }
-				];
+		<section class="grid lg:grid-cols-[1fr_0.8fr] gap-6" aria-labelledby="sources-method">
+			<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+				<h2 id="sources-method" class="text-xl font-bold text-slate-950 mb-3">Sources and method</h2>
+				<p class="text-sm text-slate-600 leading-relaxed mb-4">This review extracted all 574 pages supplied, re-footed key statements, traced material balances to ledgers and reconciliations, and visually checked the controlling pages. Source files reviewed:</p>
+				<ul class="list-disc pl-5 text-sm text-slate-700 space-y-1.5 mb-5">
+					{sourceDocuments.map(source => <li>{source}</li>)}
+				</ul>
+				<p class="text-xs text-slate-500 leading-relaxed"><strong>Key page checks:</strong> March 2026 balance sheet and income statement; reserve due-to schedule, operating and reserve bank reconciliations, and prepaid-insurance schedule; December 2025 balance sheet and income statement; 2026 budget letter and Exhibits A–E; DRE reserve worksheet and review.</p>
+				<p class="text-xs text-slate-500 leading-relaxed mt-3"><strong>Scope limitation:</strong> This is an analytical review, not an audit, reserve study, legal opinion, or attestation of board approval. Private source documents are intentionally excluded from the published repository.</p>
+			</div>
 
-				const initCharts = () => {
-					if (typeof Chart === 'undefined') return setTimeout(initCharts, 50);
-					
-					const labels = financialData.map(d => d.month);
-					const formatCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
-
-					const incomeCtx = document.getElementById('incomeChart');
-					if (incomeCtx && !incomeCtx.dataset.rendered) {
-						incomeCtx.dataset.rendered = "true";
-						new Chart(incomeCtx, {
-							type: 'bar',
-							data: {
-								labels: labels,
-								datasets: [
-									{ label: 'Member Dues', data: financialData.map(d => d.income.member), backgroundColor: '#3b82f6' },
-									{ label: 'Developer Dues', data: financialData.map(d => d.income.developer), backgroundColor: '#8b5cf6' }
-								]
-							},
-							options: {
-								responsive: true, maintainAspectRatio: false,
-								plugins: {
-									tooltip: {
-										callbacks: {
-											label: function(context) {
-												const val = context.raw;
-												let total = 0;
-												context.chart.data.datasets.forEach((ds, idx) => { if (context.chart.isDatasetVisible(idx)) total += ds.data[context.dataIndex]; });
-												const pct = total !== 0 ? Math.round((Math.abs(val) / Math.abs(total)) * 100) : 0;
-												return `${context.dataset.label}: ${formatCurrency(val)} (${pct}%)`;
-											}
-										}
-									}
-								},
-								scales: { x: { stacked: true }, y: { stacked: true, ticks: { callback: function(val) { return '$' + val / 1000 + 'k'; } } } }
-							}
-						});
-					}
-
-					const expenseCtx = document.getElementById('expenseChart');
-					if (expenseCtx && !expenseCtx.dataset.rendered) {
-						expenseCtx.dataset.rendered = "true";
-						new Chart(expenseCtx, {
-							type: 'bar',
-							data: {
-								labels: labels,
-								datasets: [
-									{ label: 'Reserves', data: financialData.map(d => d.expenses.reserves), backgroundColor: '#3b82f6' },
-									{ label: 'Insurance', data: financialData.map(d => d.expenses.insurance), backgroundColor: '#10b981' },
-									{ label: 'Management/Admin', data: financialData.map(d => d.expenses.admin), backgroundColor: '#8b5cf6' },
-									{ label: 'Utilities', data: financialData.map(d => d.expenses.utilities), backgroundColor: '#06b6d4' },
-									{ label: 'Maintenance', data: financialData.map(d => d.expenses.maintenance), backgroundColor: '#f59e0b' },
-									{ label: 'Elevator', data: financialData.map(d => d.expenses.elevator), backgroundColor: '#ef4444' }
-								]
-							},
-							options: {
-								responsive: true, maintainAspectRatio: false,
-								plugins: {
-									tooltip: {
-										callbacks: {
-											label: function(context) {
-												const val = context.raw;
-												let total = 0;
-												context.chart.data.datasets.forEach((ds, idx) => { if (context.chart.isDatasetVisible(idx)) total += ds.data[context.dataIndex]; });
-												const pct = total !== 0 ? Math.round((val / total) * 100) : 0;
-												return `${context.dataset.label}: ${formatCurrency(val)} (${pct}%)`;
-											}
-										}
-									}
-								},
-								scales: { x: { stacked: true }, y: { stacked: true, ticks: { callback: function(val) { return '$' + val / 1000 + 'k'; } } } }
-							}
-						});
-					}
-
-					const tbody = document.getElementById('financialTableBody');
-					if (tbody && !tbody.dataset.rendered) {
-						tbody.dataset.rendered = "true";
-						financialData.forEach(d => {
-							const totalIncome = d.income.member + d.income.developer;
-							const totalExpenses = d.expenses.admin + d.expenses.maintenance + d.expenses.elevator + d.expenses.utilities + d.expenses.insurance + d.expenses.reserves;
-							
-							const tr = document.createElement('tr');
-							tr.className = "hover:bg-slate-50 transition-colors";
-							tr.innerHTML = `
-								<td class="px-6 py-3 font-medium text-slate-900 border-r border-slate-100">${d.month}</td>
-								<td class="px-6 py-3 font-bold text-green-700 bg-green-50/30">${formatCurrency(totalIncome)}</td>
-								<td class="px-6 py-3">${formatCurrency(d.income.member)}</td>
-								<td class="px-6 py-3 border-r border-slate-100">${formatCurrency(d.income.developer)}</td>
-								<td class="px-6 py-3 font-bold text-rose-700 bg-rose-50/30">${formatCurrency(totalExpenses)}</td>
-								<td class="px-6 py-3">${formatCurrency(d.expenses.admin)}</td>
-								<td class="px-6 py-3">${formatCurrency(d.expenses.maintenance)}</td>
-								<td class="px-6 py-3">${formatCurrency(d.expenses.elevator)}</td>
-								<td class="px-6 py-3">${formatCurrency(d.expenses.utilities)}</td>
-								<td class="px-6 py-3">${formatCurrency(d.expenses.insurance)}</td>
-								<td class="px-6 py-3">${formatCurrency(d.expenses.reserves)}</td>
-							`;
-							tbody.appendChild(tr);
-						});
-					}
-				};
-				
-				if (document.readyState === 'loading') {
-					document.addEventListener('DOMContentLoaded', initCharts);
-				} else {
-					initCharts();
-				}
-				document.addEventListener('astro:page-load', initCharts);
-			})();
-		</script>
-
-		<section>
-			<h2 class="text-2xl font-bold text-slate-900 border-b pb-2 mb-6">6 Key Financial Trends (June 2025 - March 2026)</h2>
-			<div class="grid lg:grid-cols-3 md:grid-cols-2 gap-6">
-				<!-- Card 1 -->
-				<div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 flex flex-col hover:bg-slate-100 transition-colors">
-					<div class="flex items-center gap-3 mb-4">
-						<div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-xl shadow-sm">🏢</div>
-						<h3 class="font-bold text-slate-900 leading-tight">Developer Subsidization (The Safety Net)</h3>
-					</div>
-					<p class="text-sm text-slate-700 leading-relaxed mb-3"><strong>The Trend:</strong> Because units in the building sold slower than initially anticipated, the developer has been legally required to pay assessments on all unsold units.</p>
-					<p class="text-sm text-slate-700 flex-grow leading-relaxed"><strong>The Takeaway:</strong> The developer has faithfully subsidized the HOA, injecting tens of thousands of dollars each month to keep the building funded. In March 2026 alone, the developer was billed over <strong>$42,800</strong> to cover their share. This reliable developer safety net is currently keeping the HOA operating at a healthy surplus.</p>
-				</div>
-
-				<!-- Card 2 -->
-				<div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 flex flex-col hover:bg-slate-100 transition-colors">
-					<div class="flex items-center gap-3 mb-4">
-						<div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-sm">🔄</div>
-						<h3 class="font-bold text-slate-900 leading-tight">The Great Management Transition</h3>
-					</div>
-					<p class="text-sm text-slate-700 leading-relaxed mb-3"><strong>The Trend:</strong> In the fall of 2025, the HOA transitioned property management companies from Seabreeze Management to Action Property Management.</p>
-					<p class="text-sm text-slate-700 flex-grow leading-relaxed"><strong>The Takeaway:</strong> Changing management companies requires significant accounting cleanup. Throughout late 2025 and into early 2026, Action Property Management spent time untangling the previous company's ledgers, which included issuing dozens of <strong>$250 refund checks</strong> to residents to fix improperly coded move-in deposits. The dust has now settled, and our 2026 accounting is much cleaner.</p>
-				</div>
-
-				<!-- Card 3 -->
-				<div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 flex flex-col hover:bg-slate-100 transition-colors">
-					<div class="flex items-center gap-3 mb-4">
-						<div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl shadow-sm">🔍</div>
-						<h3 class="font-bold text-slate-900 leading-tight">Solved Mysteries: Insurance & Water (With a Submetering Caveat)</h3>
-					</div>
-					<p class="text-sm text-slate-700 leading-relaxed mb-3"><strong>The Trend:</strong> In late 2025, the income statements temporarily showed $0.00 spent on building insurance and $0.00 collected for individual water submetering, causing confusion.</p>
-					<p class="text-sm text-slate-700 leading-relaxed mb-3"><strong>The Takeaway:</strong> These mysteries were strictly timing delays! At the end of 2025, the <strong>$143,885.94</strong> annual insurance premium was officially paid, and the HOA is now properly expensing it at a rate of <strong>$12,021.08 per month</strong>. Furthermore, water submetering is now live, and the HOA successfully collected $13,806.05 in individual water usage billing from residents in the first quarter of 2026.</p>
-					<p class="text-sm text-slate-700 flex-grow leading-relaxed"><strong>The Submetering Discrepancy Explained:</strong> If an average collection of ~$4,600 per month seems low for a 148-unit building, don't worry. This suppressed average is due to a delayed system rollout in January where only $662.55 was collected. Additionally, as of March 2026, the developer is still being billed for 26 unsold units. Because empty units do not generate standard household water usage, there are fewer active meters. As these remaining units sell and residents settle into a normal billing cycle, you can expect the submetering revenue to climb significantly closer to the fully occupied budget expectation of $15,855.25 per month.</p>
-				</div>
-
-				<!-- Card 4 -->
-				<div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 flex flex-col hover:bg-slate-100 transition-colors">
-					<div class="flex items-center gap-3 mb-4">
-						<div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl shadow-sm">🏦</div>
-						<h3 class="font-bold text-slate-900 leading-tight">Faithful Reserve Savings</h3>
-					</div>
-					<p class="text-sm text-slate-700 leading-relaxed mb-3"><strong>The Trend:</strong> By law, HOAs must save for future, long-term roof and building replacements.</p>
-					<p class="text-sm text-slate-700 flex-grow leading-relaxed"><strong>The Takeaway:</strong> The Board of Directors has demonstrated excellent fiscal stewardship by strictly adhering to the reserve savings plan. Without fail, the HOA has transferred exactly <strong>$21,365.92</strong> into the Reserve Bank Account every single month. As a result, the Association has built a highly robust, dedicated savings account for the future.</p>
-				</div>
-
-				<!-- Card 5 -->
-				<div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 flex flex-col hover:bg-slate-100 transition-colors">
-					<div class="flex items-center gap-3 mb-4">
-						<div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center text-xl shadow-sm">🔧</div>
-						<h3 class="font-bold text-slate-900 leading-tight">"New Building" Maintenance Quirks</h3>
-					</div>
-					<p class="text-sm text-slate-700 leading-relaxed mb-3"><strong>The Trend:</strong> While our operating cash is strong, the general ledgers reveal several unbudgeted maintenance spikes typical of a brand-new building settling into regular use.</p>
-					<p class="text-sm text-slate-700 flex-grow leading-relaxed"><strong>The Takeaway:</strong> Over the last 10 months, the HOA has absorbed thousands of dollars in unexpected "extras." This includes emergency janitorial calls for clogged trash chutes, over <strong>$1,480</strong> in out-of-scope elevator repair extras in March 2026, and minor plumbing anomalies. Homeowners must remain diligent about properly breaking down boxes to help minimize these unbudgeted vendor trips.</p>
-				</div>
-
-				<!-- Card 6 -->
-				<div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 flex flex-col hover:bg-slate-100 transition-colors">
-					<div class="flex items-center gap-3 mb-4">
-						<div class="w-10 h-10 bg-green-100 text-green-600 rounded-xl flex items-center justify-center text-xl shadow-sm">📈</div>
-						<h3 class="font-bold text-slate-900 leading-tight">The Bottom Line: Zero Dues Increase</h3>
-					</div>
-					<p class="text-sm text-slate-700 leading-relaxed mb-3"><strong>The Trend:</strong> Despite the management transition and minor maintenance spikes, the Association's financial health is excellent.</p>
-					<p class="text-sm text-slate-700 flex-grow leading-relaxed"><strong>The Takeaway:</strong> The HOA closed out the 2025 fiscal year with an impressive net income surplus of <strong>$134,643.52</strong>. Through the first quarter of 2026, the HOA is still operating in the green with an <strong>$11,950.19 surplus</strong>. Because of this stellar liquidity, the Board determined that your monthly assessments will remain exactly the same for 2026, with no dues increase and no special assessments anticipated.</p>
-				</div>
+			<div class="rounded-2xl border border-blue-200 bg-blue-50 p-6">
+				<h2 class="text-xl font-bold text-blue-950 mb-3">Records still needed</h2>
+				<ul class="list-disc pl-5 text-sm text-blue-900/80 space-y-2 mb-5">
+					<li>Approved April–June 2026 financial packages</li>
+					<li>Adopted 12-month 2026 pro forma and board minutes</li>
+					<li>2024 on-site reserve study and 2025 update</li>
+					<li>Year-end review or audit and tax return</li>
+					<li>Current delinquency aging and reserve repayment plan</li>
+				</ul>
+				<a href="/cb-archive/#records-request" class="inline-flex items-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-800 transition">How to request records →</a>
 			</div>
 		</section>
-
-		<section>
-			<h2 class="text-2xl font-bold text-slate-900 border-b pb-2 mb-6">Maintenance Anomalies to Monitor (Q1 2026)</h2>
-			<p class="text-slate-700 mb-6 leading-relaxed">
-				While our operating cash is strong, the general ledgers reveal several unbudgeted maintenance spikes. Here are specific transactions for community awareness:
-			</p>
-			
-			<div class="grid md:grid-cols-2 gap-6">
-				<!-- Card 1 -->
-				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-start gap-4">
-					<div class="text-2xl bg-blue-50 text-blue-600 w-12 h-12 flex items-center justify-center rounded-xl flex-shrink-0">🛗</div>
-					<div>
-						<h3 class="font-bold text-slate-900 mb-1">Elevator Headaches Continue</h3>
-						<p class="text-sm text-slate-600 mb-3"><strong>The Trend:</strong> Despite having a brand-new building and an active maintenance contract, out-of-scope elevator repair costs continue to pile up.</p>
-						<p class="text-sm text-slate-600 mb-3"><strong>The Takeaway:</strong> In addition to the standard $1,701.20 monthly elevator contract, March 2026 saw massive unbudgeted spikes. The Association was billed <strong>$1,488.00</strong> for "Elevator Extras" and another whopping <strong>$5,990.00</strong> for "Elevator Repairs/Maintenance" by Otis Elevator Company.</p>
-						<div class="bg-blue-50 text-blue-800 text-xs font-medium px-3 py-2 rounded-lg">
-							<strong>Note to owners:</strong> The Board should be asked if these frequent mechanical failures are being aggressively pursued under the developer or manufacturer warranties.
-						</div>
-					</div>
-				</div>
-
-				<!-- Card 2 -->
-				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-start gap-4">
-					<div class="text-2xl bg-orange-50 text-orange-600 w-12 h-12 flex items-center justify-center rounded-xl flex-shrink-0">🗑️</div>
-					<div>
-						<h3 class="font-bold text-slate-900 mb-1">Janitorial "Extras" Spiking Again</h3>
-						<p class="text-sm text-slate-600 mb-3"><strong>The Trend:</strong> After the emergency trash chute cleanups in late 2025, out-of-scope janitorial fees have flared up again.</p>
-						<p class="text-sm text-slate-600 mb-3"><strong>The Takeaway:</strong> In March 2026, the HOA recorded <strong>$2,295.10</strong> in unbudgeted "Janitorial Extras". These additional service fees were paid to vendors like Superclean Building Services and SFBM Group.</p>
-						<div class="bg-orange-50 text-orange-800 text-xs font-medium px-3 py-2 rounded-lg">
-							<strong>Note to owners:</strong> We must remain diligent about properly breaking down boxes and disposing of trash to prevent our vendors from needing to make extra, costly trips.
-						</div>
-					</div>
-				</div>
-
-				<!-- Card 3 -->
-				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-start gap-4">
-					<div class="text-2xl bg-teal-50 text-teal-600 w-12 h-12 flex items-center justify-center rounded-xl flex-shrink-0">💧</div>
-					<div>
-						<h3 class="font-bold text-slate-900 mb-1">Recurring Plumbing Quirks</h3>
-						<p class="text-sm text-slate-600 mb-3"><strong>The Trend:</strong> Minor but persistent plumbing and sewer issues continue to require vendor dispatch.</p>
-						<p class="text-sm text-slate-600"><strong>The Takeaway:</strong> In January 2026, the HOA paid <strong>$944.12</strong> for "Plumbing Sewer" services. This was followed in March 2026 by another <strong>$1,370.50</strong> in "Plumbing Repairs" handled by Clearwater Mechanical and Pedro Femenia & Sons. While easily absorbed by our cash surplus, frequent plumbing issues in a new building warrant close monitoring.</p>
-					</div>
-				</div>
-
-				<!-- Card 4 -->
-				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-start gap-4">
-					<div class="text-2xl bg-purple-50 text-purple-600 w-12 h-12 flex items-center justify-center rounded-xl flex-shrink-0">⚡</div>
-					<div>
-						<h3 class="font-bold text-slate-900 mb-1">General Handyman and Electrical Fixes</h3>
-						<p class="text-sm text-slate-600 mb-3"><strong>The Trend:</strong> As the building settles into regular use, a cluster of general handyman and electrical fixes hit the ledgers in early 2026.</p>
-						<p class="text-sm text-slate-600"><strong>The Takeaway:</strong> January 2026 saw <strong>$985.00</strong> spent on "Garage Gates Contract/Parts". March 2026 brought a wave of minor repairs, including <strong>$750.00</strong> in "Handyman Expense", <strong>$587.80</strong> for "Electric Repairs/Lights/Supplies", and <strong>$1,173.50</strong> for "Lighting/Electric Repair".</p>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<section class="bg-blue-50 border border-blue-100 rounded-2xl p-6 text-center">
-			<p class="text-blue-800 font-medium italic">
-				Analysis will be updated as new quarterly statements are received and processed.
-			</p>
-		</section>
-
-		<hr class="border-slate-200 my-8" />
-
-		<section>
-			<h3 class="text-lg font-bold text-slate-900 mb-3">Sources & Analysis</h3>
-			<p class="text-sm text-slate-600 mb-4">
-				This financial overview is based on an independent analysis incorporating financial data updated through <strong>March 31, 2026</strong>. The numbers and insights are derived from the following verified documents:
-			</p>
-			<ul class="list-disc pl-5 text-sm text-slate-700 space-y-1 mb-8">
-				<li>Full 2025 Financial Statements</li>
-				<li>Q1 2026 Financial Statements</li>
-				<li>2025 and 2026 Approved Budgets</li>
-			</ul>
-
-			<div class="p-6 border border-slate-200 rounded-xl bg-white shadow-sm">
-				<h3 class="font-bold text-slate-900 mb-2 text-lg">Official Record Request</h3>
-				<p class="text-slate-600 text-sm leading-relaxed">
-					Pursuant to California Civil Code § 5230, and due to the public nature of this website, public downloads of association financial statements and budgets are not available. Please review the official HOA portal or reach out to management to request a copy of these records. <a href="/cb-archive/#records-request" class="text-blue-700 hover:underline font-medium">Learn more about requesting records.</a>
-				</p>
-			</div>
-		</section>
-
 	</div>
 </BaseLayout>

@@ -25,3 +25,9 @@ pnpm-debug.log*
 
 # generated standalone exports
 exports/
+
+# private HOA source documents used for local review only
+private-source-documents/
+
+# temporary extracts and renders derived from private HOA records
+tmp/pdfs/

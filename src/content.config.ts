@@ -26,10 +26,6 @@ export const collections = {
     loader: glob({ pattern: '**/[^_]*.md', base: "./src/content/policies" }),
     schema: archivalSchema
   }),
-  'financials': defineCollection({
-    loader: glob({ pattern: '**/[^_]*.md', base: "./src/content/financials" }),
-    schema: archivalSchema
-  }),
   'history': defineCollection({
     loader: glob({ pattern: '**/[^_]*.md', base: "./src/content/history" }),
     schema: archivalSchema

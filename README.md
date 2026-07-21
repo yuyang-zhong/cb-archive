@@ -4,9 +4,11 @@ This is a modern, content-heavy archival website built with Astro and Tailwind C
 
 ## Project Structure
 
-- `src/content/`: This is your CMS. Organised by category (governing, financials, etc.).
+- `src/content/`: This is your CMS. Organised by category (governing, policies, contracts, etc.).
 - `public/documents/`: Store your original PDFs here.
-- `src/data/ledger.json`: The data source for the searchable financial table.
+- `src/data/financialOverview.ts`: Reported financial figures and derived metrics used by the financial review page.
+- `src/data/ledger.json`: Legacy sample data; it is not used by the current financial review.
+- `docs/financial-review-runbook.md`: Source-review, privacy, reconciliation, projection, and handoff procedure for future financial updates.
 
 ## Workflow: Updating Content with NotebookLM
 
@@ -32,10 +34,15 @@ keyTakeaways:
 (Paste NotebookLM synthesis here)
 ```
 
-### 2. Updating the Financial Ledger
-1. Upload your financial statement PDF to NotebookLM.
-2. Prompt: *"Extract all ledger line items into a JSON array with keys: date (YYYY-MM-DD), category, description, amount (number)."*
-3. Copy the resulting JSON and append/replace it in `src/data/ledger.json`.
+### 2. Updating the Financial Review
+Follow `docs/financial-review-runbook.md` for the full procedure and current verified baseline.
+
+1. Obtain the latest board-approved balance sheet, income statement, budget-to-actual report, bank reconciliations, receivable aging, and reserve study or annual reserve disclosure.
+2. Re-foot totals against the source statements before changing the site. Do not rely on an AI extraction without checking every displayed figure.
+3. Update only the reported inputs in `src/data/financialOverview.ts`. Derived run rates and ratios are calculated from those inputs.
+4. Update `reviewedOn` and `asOf` separately so the page clearly shows any reporting lag.
+5. Keep association financial records in the official member portal; do not add private statements to this public repository.
+6. Run `npm run build` and review the generated financial page at desktop and mobile widths.
 
 ## Deployment to GitHub Pages
 
