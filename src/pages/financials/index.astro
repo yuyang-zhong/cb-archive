@@ -108,8 +108,8 @@ const projectionScenarios = [
 					</div>
 					<div class="rounded-2xl border border-amber-200 bg-white p-4">
 						<span class="text-xs font-bold uppercase tracking-wider text-amber-700">Reserves</span>
-						<p class="text-lg font-extrabold text-slate-950 mt-1">Not rateable</p>
-						<p class="text-xs text-slate-500 mt-1">The current study and funded percentage were not supplied.</p>
+						<p class="text-lg font-extrabold text-slate-950 mt-1">Transition due</p>
+						<p class="text-xs text-slate-500 mt-1">Contributions track the DRE startup model; physical-condition adequacy awaits the first property-specific study.</p>
 					</div>
 					<div class="rounded-2xl border border-rose-200 bg-white p-4">
 						<span class="text-xs font-bold uppercase tracking-wider text-rose-700">Reporting controls</span>
@@ -133,7 +133,7 @@ const projectionScenarios = [
 								<li class="flex gap-3"><span class="font-black text-indigo-600">01</span><span><strong class="text-indigo-950">Reported income is not available cash.</strong> The Q1 surplus is positive, but unrestricted operating cash is only {currency(reported.unrestrictedOperatingCash)} after the reserve obligation.</span></li>
 								<li class="flex gap-3"><span class="font-black text-indigo-600">02</span><span><strong class="text-indigo-950">Most reserves are not in the reserve bank.</strong> {currency(reported.reserveDueFromOperating)}—{percent(derivedFinancials.reserveInterfundShare)} of the reserve fund—remains an interfund receivable.</span></li>
 								<li class="flex gap-3"><span class="font-black text-indigo-600">03</span><span><strong class="text-indigo-950">The board will inherit a reporting backlog.</strong> April through June statements are still pending while operating costs and occupancy continue to change.</span></li>
-								<li class="flex gap-3"><span class="font-black text-indigo-600">04</span><span><strong class="text-indigo-950">The governing financial record set needs repair.</strong> The supplied budget exhibits conflict with the statements, and the referenced current reserve study was not provided.</span></li>
+								<li class="flex gap-3"><span class="font-black text-indigo-600">04</span><span><strong class="text-indigo-950">The reserve program has reached its first-study transition.</strong> The DRE worksheet is the correct new-development baseline, but it should now be replaced by a property-specific visual study that reflects actual component conditions.</span></li>
 								<li class="flex gap-3"><span class="font-black text-indigo-600">05</span><span><strong class="text-indigo-950">Developer closeout evidence must be preserved.</strong> Billing adjustments, warranties, open construction items, vendor claims, and responsibility for early-life repairs should be resolved before institutional knowledge is lost.</span></li>
 							</ul>
 						</div>
@@ -145,7 +145,7 @@ const projectionScenarios = [
 								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">First meeting · Accept a documented turnover inventory.</strong> Require bank reconciliations, general ledgers, receivable and payable aging, open checks, tax and CPA files, contracts, insurance, warranties, claims, reserve records, minutes, and a list of unresolved developer obligations with accountable owners and due dates.</li>
 								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 30 days · Establish the true cash position.</strong> Resolve the reserve interfund balance, suspense debit, stale insurance check, and developer-billing adjustment; adopt a reserve-repayment schedule and a minimum unrestricted operating-cash floor.</li>
 								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 30 days · Restore timely reporting.</strong> Complete April–June packages and begin a recurring monthly review calendar with written explanations for material variances and unreconciled items.</li>
-								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 60 days · Correct the financial plan.</strong> Identify the adopted 12-month 2026 budget, correct the exhibits, obtain the stated 2024/2025 reserve work or commission a current study, and formally review the reserve funding plan.</li>
+								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 60 days · Correct the financial plan.</strong> Identify the adopted 12-month 2026 budget, correct the exhibits, commission the first independent property-specific reserve study, and use the DRE contribution schedule as the interim index until the board adopts the new study and funding plan.</li>
 								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 90 days · Independent closeout review.</strong> Ask the Association's CPA and counsel to review year-end adjustments, tax and statutory reporting, turnover completeness, contracts, warranty recovery, and any continuing developer obligations.</li>
 							</ol>
 						</div>
@@ -322,8 +322,8 @@ const projectionScenarios = [
 
 		<section aria-labelledby="document-control">
 			<div class="border-b border-slate-200 pb-3 mb-6">
-				<p class="text-xs font-bold uppercase tracking-[0.18em] text-rose-700 mb-1">Budget and reserve document control</p>
-				<h2 id="document-control" class="text-2xl font-bold text-slate-950">The supplied packets do not support every statement they make</h2>
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-rose-700 mb-1">Budget control and reserve transition</p>
+				<h2 id="document-control" class="text-2xl font-bold text-slate-950">The startup reserve basis is valid, but the first field study is now due</h2>
 			</div>
 
 			<div class="grid md:grid-cols-2 gap-5">
@@ -333,10 +333,11 @@ const projectionScenarios = [
 					<p class="text-sm text-rose-900/80 mt-3 leading-relaxed">The {currency(reported.partialYearTotalPrintedInBudgetExhibit, 0)} total is appropriate for 2025: it equals seven startup months at approximately {currency(88_035.12)} per month. The problem is its inclusion, still labeled 2025, in the packet whose cover identifies fiscal 2026. The 2026 statements correctly use a full 12-month annual budget of {currency(reported.annualBudgetUsedInStatements, 0)}. Management should identify and distribute the board-adopted 12-month 2026 exhibit.</p>
 				</div>
 
-				<div class="rounded-2xl border border-rose-200 bg-rose-50 p-6">
-					<p class="text-xs font-bold uppercase tracking-wider text-rose-700">Reserve study evidence</p>
-					<h3 class="text-lg font-bold text-rose-950 mt-2">The referenced 2024 study and 2025 update are not in the supplied files</h3>
-					<p class="text-sm text-rose-900/80 mt-3 leading-relaxed">The 2026 letter says an on-site study was performed in 2024 and an accounting update in 2025. The attached reserve pages are instead a preconstruction DRE budget worksheet dated April 24, 2023 and revised November 27, 2023. They calculate an annual contribution, but do not show accumulated cash, fully funded balance, percent funded, inflation and interest assumptions, or a 30-year cash-flow projection.</p>
+				<div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
+					<p class="text-xs font-bold uppercase tracking-wider text-emerald-700">New-development reserve basis</p>
+					<h3 class="text-lg font-bold text-emerald-950 mt-2">The DRE worksheet is the correct startup index</h3>
+					<p class="text-sm text-emerald-900/80 mt-3 leading-relaxed">No earlier property-specific reserve study exists or would be expected for the pre-operational development period. The DRE worksheet dated April 24, 2023 and revised November 27, 2023 is the governing developer estimate for startup reserve contributions. March's {currency(reported.monthlyReserveAllocation)} allocation tracks that model. Until the first field study is adopted, reserve estimates should continue to index against this schedule—not against a nonexistent 2024 or 2025 study.</p>
+					<p class="text-sm text-emerald-900/80 mt-3 leading-relaxed">The 2026 budget letter's statements that an on-site study occurred in 2024 and an accounting update occurred in 2025 are inconsistent with the Association's confirmed history and should be corrected as inaccurate template language.</p>
 				</div>
 
 				<div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
@@ -348,7 +349,8 @@ const projectionScenarios = [
 				<div class="rounded-2xl border border-blue-200 bg-blue-50 p-6">
 					<p class="text-xs font-bold uppercase tracking-wider text-blue-700">Special-assessment statement</p>
 					<h3 class="text-lg font-bold text-blue-950 mt-2">The board said none was anticipated—not that one was impossible</h3>
-					<p class="text-sm text-blue-900/80 mt-3 leading-relaxed">As of the November 2025 budget letter, the board did not anticipate a special assessment for major components or reserve adequacy and expressly said that statement was not a guarantee. Because the referenced reserve study was not supplied, this review cannot independently validate that conclusion. California's disclosure framework appears in Civil Code <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=5300." target="_blank" rel="noreferrer">§ 5300</a>, <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=5550." target="_blank" rel="noreferrer">§ 5550</a>, and <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=5570." target="_blank" rel="noreferrer">§ 5570</a>.</p>
+					<p class="text-sm text-blue-900/80 mt-3 leading-relaxed">As of the November 2025 budget letter, the board did not anticipate a special assessment for major components or reserve adequacy and expressly said that statement was not a guarantee. That conclusion can presently be compared only with the generalized DRE startup model and current cash—not with actual component conditions, percent funded, or a long-range property-specific cash flow.</p>
+					<p class="text-sm text-blue-900/80 mt-3 leading-relaxed">California DRE's <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://www.dre.ca.gov/files/pdf/forms/re623.pdf" target="_blank" rel="noreferrer">RE 623 guidance</a> says a new association should conduct a reserve study after its first operating year to adjust the reserve funding plan. Civil Code <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=5550." target="_blank" rel="noreferrer">§ 5550</a> separately requires a reasonably competent visual inspection at least every three years, when its statutory conditions apply, plus annual review of the study and funding plan.</p>
 				</div>
 			</div>
 		</section>
@@ -452,7 +454,7 @@ const projectionScenarios = [
 					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">02 · Cash</span><p class="text-slate-300 mt-2">Adopt a documented repayment plan for the {currency(reported.reserveDueFromOperating)} interfund balance and preserve an operating-cash floor.</p></li>
 					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">03 · Exceptions</span><p class="text-slate-300 mt-2">Resolve the CollectBureau suspense debit and the stale insurance check; retain invoice and bank support.</p></li>
 					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">04 · Budget</span><p class="text-slate-300 mt-2">Identify the adopted 2026 budget and reissue a 12-month pro forma with the correct year and annual totals.</p></li>
-					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">05 · Reserves</span><p class="text-slate-300 mt-2">Obtain the stated 2024 on-site study and 2025 update, including percent funded and 30-year cash flow—or commission the current study if they cannot be produced.</p></li>
+					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">05 · Reserves</span><p class="text-slate-300 mt-2">Commission the first independent property-specific reserve study now that the startup year has passed. Continue indexing interim contributions to the DRE schedule, then formally adopt the study's component plan and long-range funding recommendation.</p></li>
 					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">06 · Operations</span><p class="text-slate-300 mt-2">Maintain system-level exception logs for elevators, plumbing, access control, and janitorial work, including warranty and developer recovery.</p></li>
 				</ol>
 			</div>
@@ -474,7 +476,7 @@ const projectionScenarios = [
 				<ul class="list-disc pl-5 text-sm text-blue-900/80 space-y-2 mb-5">
 					<li>Approved April–June 2026 financial packages</li>
 					<li>Adopted 12-month 2026 pro forma and board minutes</li>
-					<li>2024 on-site reserve study and 2025 update</li>
+					<li>First independent property-specific reserve study following the initial operating year</li>
 					<li>Year-end review or audit and tax return</li>
 					<li>Current delinquency aging and reserve repayment plan</li>
 				</ul>

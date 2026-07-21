@@ -37,9 +37,9 @@ Use sources in this order:
 
 1. Board-approved monthly financial statements and their ledgers/reconciliations
 2. Board-adopted annual budget and meeting record
-3. Current professional reserve study and annual update
+3. Current property-specific professional reserve study and annual update, once one exists
 4. Annual budget report and statutory reserve disclosures
-5. DRE or developer preconstruction estimates
+5. DRE or developer preconstruction estimates—the controlling reserve baseline during startup, before the first property-specific study
 6. Explicitly labeled analyst assumptions
 
 Keep these dates separate:
@@ -50,6 +50,8 @@ Keep these dates separate:
 Do not treat a newer file as approved merely because it exists. Confirm its status from the user, board record, or approved minutes. Always disclose a reporting lag.
 
 The verified 2025 baseline is a special partial-year case: the Association became operational around May, and the budget and statements use seven operating months from June through December. That seven-month model is appropriate for 2025. Do not annualize it or criticize it for not covering 12 months. Beginning in 2026, use a full 12-month budget and reporting model.
+
+For a new development that has not yet completed its first property-specific reserve study, use the DRE worksheet as the canonical reserve-estimate source even though it ranks below an adopted professional study in the mature-state hierarchy above. Once the board adopts the first property-specific study, that study supersedes the generalized DRE estimates for future reserve projections and funding-plan comparisons.
 
 ## Review workflow
 
@@ -135,6 +137,12 @@ For material exceptions, state the amount, period, source description, likely op
 
 ### 5. Review reserves
 
+Apply the reserve-source lifecycle before assessing adequacy:
+
+1. **New-development startup:** Use the approved DRE or developer worksheet as the reserve contribution and projection index. It is based on generalized assumptions and plans, not observed component conditions.
+2. **After the first operating year:** Commission the first property-specific visual reserve study. [California DRE form RE 623](https://www.dre.ca.gov/files/pdf/forms/re623.pdf) says a new association should perform this study after its first operating year to adjust the reserve funding plan. An independent reserve professional is the prudent board-engagement standard.
+3. **Ongoing program:** Apply [Civil Code § 5550](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=5550.)'s visual-inspection cycle at least every three years, when its statutory conditions apply, and review the reserve study and funding plan annually. Use the adopted property-specific study—not the original DRE worksheet—as the index for later reserve estimates.
+
 A current reserve study should normally provide enough information to identify:
 
 - Inspection and study dates
@@ -149,7 +157,9 @@ A current reserve study should normally provide enough information to identify:
 - Thirty-year cash-flow projection and minimum balance
 - Expected special assessments, borrowing, or contribution increases
 
-A DRE preconstruction budget worksheet that divides estimated replacement cost by useful life is not a substitute for a current reserve study. If the budget packet references a study or update that is not actually attached, report it as a missing record rather than assuming its conclusions.
+A DRE preconstruction worksheet is an appropriate interim startup basis, but it is not a long-term substitute for the first property-specific study. Before that study exists, assess whether actual contributions follow the DRE schedule and state that physical-condition adequacy, percent funded, and long-range cash flow are not yet independently measurable. After the first study is adopted, index reserve analysis against it.
+
+If a budget packet references a study or update that is not attached, first determine whether the work existed. Report it as a missing record only if it was performed but not supplied. If the Association confirms that it never occurred, flag the packet statement as inaccurate or boilerplate rather than implying a document is being withheld.
 
 ### 6. Build projections conservatively
 
@@ -197,7 +207,8 @@ Other baseline facts:
 - The 2026 statements use a 12-month, break-even annual budget of $1,056,422.
 - The $616,245 Exhibit A total is appropriate for the seven-month 2025 startup period. The document-control issue is that this 2025 partial-year exhibit was reused inside the 2026 packet even though 2026 is a full 12-month year.
 - The supplied reserve worksheet is dated April 24, 2023, revised November 27, 2023, and is a DRE preconstruction estimate.
-- The 2026 budget letter references a 2024 on-site reserve study and a 2025 accounting update, but those studies were not among the files reviewed.
+- No 2024 on-site reserve study or 2025 accounting update exists. The references in the 2026 budget letter are inaccurate template language, not missing records.
+- Until the first property-specific study is adopted, reserve estimates and contribution comparisons should index to the DRE worksheet. The next transition step is to commission that study now that the initial operating year has passed.
 
 Treat this baseline as a comparison point, not a value to carry forward. Replace it with the new approved statement balances.
 
