@@ -220,7 +220,7 @@ Other baseline facts:
 - Possible duplicate payments to verify: Recology $7,320.25 (Nov 2025), Bay Alarm $2,839.05 (Dec 2025).
 - Janitorial labor has not been paid since December 2025 although Superclean still bills supplies; possible unbilled liability up to ≈$30k for Jan–Sep.
 - Mid-Block agreement: $103,191 payment due when the facilities transfer to MBMC (no date), repeating every 10 years, CPI-adjusted (≤3.5%/yr).
-- Subsequent events (after September 30): management reports all units sold, and a one-time developer payment for sidewalk-related costs is being deposited to the reserve account in October. Confirm it is booked as a separately tracked designated fund, not operating income or general reserves. The public page omits the amount.
+- Subsequent events (after September 30): management reports all units sold, and a one-time $300,000 developer payment is being deposited in October. It is a general contribution toward the first Mid-Block payment ($103,191) and sinking-sidewalk (ground settlement) repairs, not tied to an invoice. Confirm it is booked as a separately tracked designated fund, not operating income or general reserves; CPA/counsel should confirm whether it belongs in the reserve account given Civ. Code §5510 limits. Add later Mid-Block cycles (up to ≈$146k at year 10) and sidewalk settlement to the reserve study.
 
 ### October 26 review handoff
 
