@@ -215,7 +215,7 @@ Other baseline facts:
 - MeterNet remits one lockbox deposit a month (Jun–Aug 2026: $10.3–11.6k). None arrived in September. Since June 2025 remittances are 61% of water cost; at the budget's 91% recovery ratio the shortfall is $37,409.76 ($26,158.46 start-up, $11,251.30 September).
 - The 2026 budget is the 2023 DRE worksheet × 12. Its electricity line nets a $4,029.58/month solar credit (Solarix letter, Jan 5, 2022); no credit appears in 2026 ledgers. Its "New Construction" line ($93,030 incl. garage) is the DRE 10% contingency, not a service.
 - DRE reserve list: "Outdoor Table 4 × $6,000 = $24,011.52/yr" and "Wooden Bench 15 × $3,750 = $56,263.68/yr" (worksheet p. 9) are probably replacement costs entered as annual amounts ($80,275; 32% of the contribution). Ask the reserve-study preparer. Association Reserves was paid $3,405 in September.
-- The "5% + CPI-U, 10% ceiling" assessment cap is not in any archived document (it matches Civ. Code §1947.12 rent caps). Treat it as unverified until the MOHCD/OCII City Documents are obtained.
+- No 5% + CPI cap applies (confirmed by the board). The governing limit is 20% for regular assessments without a member vote (Civ. Code §5605; CC&R §6.6), conditioned on a complete §5300 budget report.
 - Garage cost center: CC&R §6.9.2 requires separate accounting. Parking-license income ($7,050 YTD) is in 336000; building AT&T lines ($6,954) are in 501000-01; garage electricity was allocated only in September.
 - Possible duplicate payments to verify: Recology $7,320.25 (Nov 2025), Bay Alarm $2,839.05 (Dec 2025).
 - Janitorial labor has not been paid since December 2025 although Superclean still bills supplies; possible unbilled liability up to ≈$30k for Jan–Sep.
