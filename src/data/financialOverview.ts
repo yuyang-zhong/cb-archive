@@ -1,222 +1,357 @@
 export const financialOverview = {
-  reviewedOn: 'September 14, 2026',
-  asOf: 'August 31, 2026',
-  latestMonth: 'August',
+  reviewedOn: 'October 26, 2026',
+  asOf: 'September 30, 2026',
+  statementsPreparedOn: 'October 26, 2026',
+  latestMonth: 'September',
   previousReview: {
-    asOf: 'June 30, 2026',
-    surplus: 45_457.94,
-    unrestrictedOperatingCash: 95_644.77,
-    reserveDueFromOperating: 85_463.84,
+    asOf: 'August 31, 2026',
+    ytdSurplus: 58_251.51,
+    unrestrictedOperatingCash: 152_878.27,
+    reserveFundBalance: 320_774.07,
   },
   units: {
     total: 148,
-    closedAtLatestClosingLog: 145,
-    closingDataAsOf: 'August 6, 2026',
+    // Management reported in October 2026 that every unit is sold.
+    soldPerManagement: 148,
+    lastDeveloperBill: { month: 'September 2026', units: 2, amount: 926.34 },
   },
   reported: {
-    operatingMonths2025: 7,
-    revenue2025: 537_030.09,
-    expenses2025: 402_386.57,
-    netIncome2025: 134_643.52,
-    ytdRevenue: 659_048.87,
-    ytdBudgetRevenue: 704_281.28,
-    ytdExpenses: 600_797.36,
-    ytdBudgetExpenses: 704_281.28,
-    ytdSurplus: 58_251.51,
-    monthlyResults: [
-      { month: 'January', result: 6_948.97 },
-      { month: 'February', result: 10_906.64 },
-      { month: 'March', result: -5_905.42 },
-      { month: 'April', result: 19_077.78 },
-      { month: 'May', result: 12_405.02 },
-      { month: 'June', result: 2_024.95 },
-      { month: 'July', result: 4_193.76 },
-      { month: 'August', result: 8_599.81 },
+    annualBudget: 1_056_422,
+    monthlyBudget: 88_035.16,
+    memberAssessmentsBudget: 817_387,
+    garageAssessmentsBudget: 48_772,
+    submeterBudget: 190_263,
+    ytdRevenue: 730_977.93,
+    ytdExpenses: 690_355.84,
+    ytdSurplus: 40_622.09,
+    ytdBudget: 792_316.44,
+    ytdReserveFunding: 192_685.44,
+    monthly2026: [
+      { month: 'Jan', revenue: 72_397.57, expenses: 65_448.60 },
+      { month: 'Feb', revenue: 80_951.07, expenses: 70_044.43 },
+      { month: 'Mar', revenue: 77_984.75, expenses: 83_890.17 },
+      { month: 'Apr', revenue: 93_523.87, expenses: 74_446.09 },
+      { month: 'May', revenue: 81_881.16, expenses: 69_476.14 },
+      { month: 'Jun', revenue: 83_734.94, expenses: 81_709.99 },
+      { month: 'Jul', revenue: 84_854.22, expenses: 80_660.46 },
+      { month: 'Aug', revenue: 83_721.29, expenses: 75_121.48 },
+      { month: 'Sep', revenue: 71_929.06, expenses: 89_558.48 },
     ],
-    julyRevenue: 84_854.22,
-    julyExpenses: 80_660.46,
-    julyUnrestrictedOperatingCash: 127_693.36,
-    julyReserveBankCash: 213_852.92,
-    julyReserveFundBalance: 299_316.76,
-    latestMonthRevenue: 83_721.29,
-    latestMonthExpenses: 75_121.48,
-    unclearedMaintenanceCredit: 3_786,
-    annualBudgetUsedInStatements: 1_056_422,
-    monthlyBudgetUsedInStatements: 88_035.16,
-    partialYearTotalPrintedInBudgetExhibit: 616_245,
-    totalAssets: 517_482.30,
-    operatingBankCash: 216_976.19,
-    unrestrictedOperatingCash: 152_878.27,
-    accountsReceivable: 4_364.30,
-    ownerAssessmentsReceivable: 2_651.06,
-    allowanceForDoubtfulAccounts: 442.48,
-    ownerReceivablesOlderThan30Days: 943.45,
-    ownerReceivablesOlderThan90Days: 442.48,
-    developerAssessmentsReceivable: 0,
-    otherReceivables: 2_155.72,
-    prepaidExpenses: 39_465.66,
-    prepaidAssessments: 19_132.55,
-    refundableDeposits: 7_200,
+    totalAssets: 523_325.50,
+    operatingLedgerCash: 193_502.81,
+    operatingBankBalance: 347_537.11,
+    unrestrictedOperatingCash: 150_770.81,
+    prepaidAssessments: 21_782.20,
+    refundableDeposits: 6_550,
     suspenseDebit: 5_298.26,
-    reserveFundBalance: 320_774.07,
-    reserveBankCash: 256_676.15,
-    reserveDueFromOperating: 64_097.92,
+    operatingEquity: 158_044.52,
+    reserveFundBalance: 342_247.04,
+    reserveBankCash: 299_515.04,
+    reserveDueFromOperating: 42_732,
+    reserveCostCenterBalance: 10_216.25,
     monthlyReserveAllocation: 21_365.92,
-    ytdReserveFundingIncludingInterest: 171_212.47,
-    reserveRepaymentsToDate: 85_463.68,
-    currentYearAdjustment: 17_221.09,
-    grossUtilitiesYtd: 178_757.11,
-    ytdWaterReimbursements: 73_954.69,
-    ytdWaterReimbursementBudget: 126_842,
-    fullOccupancyWaterBudgetMonthly: 15_855.25,
-    propertyInsurancePremium: 143_885.94,
-    workersCompPremium: 367,
-    insurancePackageTotal: 144_252.94,
-    insuranceAmortizationMonthly: 12_021.08,
-    unclearedPropertyInsuranceCheck: 143_885.94,
-    latestDeveloperBilling: 2_722.80,
-    statementDeveloperUnsoldUnits: 6,
+    annualReserveContribution: 256_391,
+    generalReserveContribution: 248_729,
+    reserveYield: 0.0045,
+    receivables: {
+      net: 4_564.27,
+      owners: 2_422.01,
+      ownersOver30: 359.50,
+      ownerAccountsOver30: 3,
+      other: 2_155.72,
+      allowance: 13.46,
+      developer: 0,
+    },
+    insurance: {
+      package: 144_252.94,
+      budget: 131_371,
+      monthlyAmortization: 12_021.08,
+      prepaidRemaining: 24_042.14,
+      termEnds: 'November 27, 2026',
+      duplicateCheck: 143_885.94,
+      duplicateCheckDated: 'December 1, 2025',
+      duplicateCheckAgeDays: 303,
+    },
+    elevatorContract: { annual: 20_414.44, termEnds: 'October 31, 2026' },
+    otherStaleItems: { count: 6, amount: 2_736.53 },
   },
-  watchItems: [
-    {
-      category: 'Budget-to-ledger alignment',
-      period: 'Jan–Aug 2026',
-      amount: 103_483.92,
-      detail: 'Landscape actuals were $13,777.63 against $2,178.64 budgeted. Janitorial contract, window washing, and new-construction lines still show no actuals against $46,531.36, $20,009.36, and $62,020.00 of combined budgets respectively.',
-      action: 'Reconcile the adopted pro forma, CINC budget mapping, vendor coding, and missing accruals before treating the full variance as recurring savings.',
-      priority: 'High',
-    },
-    {
-      category: 'Fire, life-safety, and access systems',
-      period: 'Jan–Aug 2026',
-      amount: 13_277.28,
-      detail: '$6,229.70 of access-control cost plus $7,047.58 across fire extinguisher, sprinkler, and monitoring accounts. July and August access entries are telecom charges; they do not by themselves establish repair incidents.',
-      action: 'Match each invoice to contract scope, startup warranty, and developer responsibility, and confirm that recurring life-safety service is mapped to the correct budget lines.',
-      priority: 'High',
-    },
-    {
-      category: 'Elevator repairs and extras',
-      period: 'Jan–Aug 2026',
-      amount: 9_312,
-      detail: '$1,488 of extras plus $7,824 of repair and maintenance charges, unchanged in July and August and excluding the separately amortized base contract.',
-      action: 'Match invoices to the Otis scope, warranties, and any developer responsibility before treating the pattern as normal operating cost.',
-      priority: 'Medium',
-    },
-    {
-      category: 'Landscape and irrigation',
-      period: 'Jan–Aug 2026',
-      amount: 13_777.63,
-      detail: '$12,331.80 of recurring landscape charges plus the $1,445.83 June irrigation repair. July and August each cost $1,575.90 against a $272.33 monthly category budget.',
-      action: 'Confirm the recurring contract, code the irrigation repair consistently, and correct the account-level budget mapping.',
-      priority: 'Medium',
-    },
-    {
-      category: 'Plumbing and sewer repairs',
-      period: 'Jan–Aug 2026',
-      amount: 4_377.01,
-      detail: '$944.12 of sewer work and $3,432.89 of plumbing repairs, including $900.39 in July and $655.00 in August.',
-      action: 'Track location, cause, repeat occurrence, and warranty recovery rather than relying only on the general-ledger category.',
-      priority: 'Monitor',
-    },
-    {
-      category: 'Utilities and refuse',
-      period: 'August 2026',
-      amount: 27_115.27,
-      detail: 'August utilities exceeded the $26,017.67 monthly budget. Refuse alone was $8,690.23 against $4,281.67 budgeted; water reimbursements were $11,611.31 against $15,855.25 budgeted.',
-      action: 'Check service levels, rate changes, billing periods, and submeter collections before extrapolating the earlier utility savings.',
-      priority: 'High',
-    },
-    {
-      category: 'Maintenance credit awaiting bank clearance',
-      period: 'August 2026',
-      amount: 3_786,
-      detail: 'An August 31 credit reduced common-area maintenance expense and increased operating ledger cash, but the receipt remained uncleared at month-end.',
-      action: 'Obtain the credit support and subsequent bank clearance. Treat the benefit as nonrecurring when assessing the monthly operating pace.',
-      priority: 'High',
-    },
+
+  // Water cost (408000) and MeterNet remittances by month. 2025 values are from the
+  // prior-manager packages; remittances are the lockbox deposits booked as "Submeter".
+  submeterHistory: [
+    { month: 'Jun 25', water: 0, remitted: 0 },
+    { month: 'Jul 25', water: 1_097.25, remitted: 0 },
+    { month: 'Aug 25', water: 1_363.94, remitted: 0 },
+    { month: 'Sep 25', water: 4_554.76, remitted: 0 },
+    { month: 'Oct 25', water: 5_451.48, remitted: 0 },
+    { month: 'Nov 25', water: 7_509.20, remitted: 0 },
+    { month: 'Dec 25', water: 12_940.34, remitted: 4_078.96 },
+    { month: 'Jan 26', water: 7_277.64, remitted: 662.55 },
+    { month: 'Feb 26', water: 9_867.07, remitted: 6_821.44 },
+    { month: 'Mar 26', water: 9_107.63, remitted: 6_312.90 },
+    { month: 'Apr 26', water: 9_864.66, remitted: 17_315.41 },
+    { month: 'May 26', water: 11_117.33, remitted: 9_487.95 },
+    { month: 'Jun 26', water: 9_816.41, remitted: 10_331.17 },
+    { month: 'Jul 26', water: 11_500.97, remitted: 11_302.39 },
+    { month: 'Aug 26', water: 12_918.62, remitted: 11_599.42 },
+    { month: 'Sep 26', water: 12_366.65, remitted: 0 },
   ],
+  submeterGap: { total: 37_409.76, startup: 26_158.46, september: 11_251.30, budgetRecoveryRatio: 0.9098 },
+
+  // Tiers: missing = confirmed not received; recover = verify, then recover; unrealized = budgeted
+  // benefit never received; question = unconfirmed, ask management. Do not total across tiers.
+  receivableGaps: [
+    { tier: 'missing', item: 'MeterNet September remittance', amount: 11_251.30, status: 'Missing', note: 'Monthly water-billing deposit (Jun–Aug ≈ $11.3–11.6k) did not arrive. The $16.32 booked to Submeter is owner interest.' },
+    { tier: 'unrealized', item: 'MeterNet start-up under-recovery', amount: 26_158.46, status: 'Ask', note: 'No remittances Jun–Nov 2025; ≈46% recovery Dec–Mar. Measured against the budget’s 91% recovery ratio.' },
+    { tier: 'unrealized', item: 'Solar production credit', amount: 36_266.22, status: 'Missing', note: 'Electricity budget nets a $4,029.58/mo solar credit. No credit appears on any 2026 bill (Jan–Sep shown).' },
+    { tier: 'question', item: 'Initial-sale move-in fees', amount: 33_000, status: 'Ask', note: 'Rules require 50% of a month’s assessment paid in escrow at each initial sale. None is recorded; payee unconfirmed (estimate).' },
+    { tier: 'recover', item: 'Possible Recology double payment', amount: 7_320.25, status: 'Verify', note: 'Two identical web payments cleared Nov 7 and Nov 12, 2025; both expensed.' },
+    { tier: 'recover', item: 'Possible Bay Alarm duplicate', amount: 2_839.05, status: 'Verify', note: 'Two identical sprinkler invoices paid on one Dec 2025 check.' },
+    { tier: 'question', item: 'Garage spaces credited monthly', amount: 5_400, status: 'Ask', note: 'Four of 34 spaces are credited every month ($600/mo; Jan–Sep shown). Confirm the basis.' },
+  ],
+
+  // Current monthly run-rate vs. 2026 monthly budget, per category.
+  spendingIncreases: [
+    { category: 'Refuse', budget: 4_282, current: 8_998, cause: 'Recology stepped to ≈$9k/mo from July. Rate reset or added service—pull invoices.' },
+    { category: 'Management', budget: 4_000, current: 7_220, cause: '$6,000 base fee plus admin charges; budget still uses the DRE $3,500 estimate.' },
+    { category: 'Electricity', budget: 3_520, current: 5_982, cause: 'Budget assumes a $4,030/mo solar credit that is not appearing. Usage also rose sharply in Sep–Oct.' },
+    { category: 'Elevator', budget: 938, current: 2_736, cause: 'Otis contract ($20.4k/yr) was never budgeted; plus repairs. Renews Oct 31.' },
+    { category: 'Landscape', budget: 272, current: 1_696, cause: 'DRE budget error; BrightView contract is $1,575.90/mo.' },
+    { category: 'Insurance', budget: 10_948, current: 12_021, cause: 'Package came in 9.8% over budget. Renews Nov 27.' },
+    { category: 'Fire & life safety', budget: 238, current: 1_233, cause: 'Monitored high-rise system; Bay Alarm rates +8.8% in September.' },
+    { category: 'Telecom', budget: 0, current: 858, cause: 'AT&T lines for alarms/access; budget carried a placeholder.' },
+  ],
+  unpaidBudgetLines: [
+    { category: 'Janitorial labor', budget: 69_797, note: 'Superclean on site; HOA has paid no labor since Dec 2025 ($3,350/mo then). Who pays—or is it unbilled?' },
+    { category: '“New Construction” contingency', budget: 93_030, note: 'DRE 10% start-up contingency, not a service. $0 spent.' },
+    { category: 'Window washing', budget: 30_014, note: 'Deferred by the prior board until nearby construction ends.' },
+    { category: 'Solar maintenance', budget: 10_017, note: 'No solar vendor in any ledger.' },
+  ],
+
+  codingFixes: [
+    { fix: 'Move parking-license income to the garage cost center', amount: 7_050, detail: '336000 Parking Spaces → 300000-01. The license ties the $150 fee to the cost center.' },
+    { fix: 'Move building telecom out of the garage cost center', amount: 6_954, detail: 'AT&T lines in 501000-01 → telephone/fire-suppression lines.' },
+    { fix: 'Allocate garage electricity for Jan–Aug', amount: 9_400, detail: 'Only September was split to 404000-01. Estimate $9.4k–$15.5k depending on method.' },
+    { fix: 'Allocate garage shares never posted', amount: 9_266.75, detail: 'Garage gates $1,970; insurance $1,958; management $4,502; reserve study ≈$837.' },
+    { fix: 'Write off duplicate-billing receivable', amount: 2_155.72, detail: '“Other Receivables” is Jan–Mar assessments re-billed in April; YTD assessments are overstated $2,778.66.' },
+    { fix: 'Book the Otis contract to its own budgeted line', amount: 15_310.80, detail: 'Posted to 518000 (no budget); the budget sits in 518500 repairs.' },
+    { fix: 'Reclass misc. items', amount: 2_147.08, detail: 'Owner interest in Submeter $137.78; PG&E tax in Other Taxes $627.98; Jan sewer in Plumbing $944.12; locksmith netted in FOB income $437.20.' },
+    { fix: 'Relabel “New Construction” as contingency', amount: 93_030, detail: 'It is the DRE 10% start-up contingency; resize it in the 2027 budget.' },
+  ],
+
+  garageCostCenter: {
+    spaces: 34,
+    feePerSpace: 150,
+    budgetPerSpace: 119.54,
+    ytdBudget: 36_578.97,
+    reported: { revenue: 31_200, expenses: 16_888.36 },
+    restated: { revenue: 38_250, expensesLow: 28_601, expensesHigh: 34_701 },
+  },
+
+  reserves: {
+    dreTablesAndBenches: 80_275,
+    dreCorrectedNeed: 173_800,
+    percentFundedRange: [0.71, 1.30],
+    projectedYearEnd: 406_675,
+    safeCutNow: 0.10,
+    cutIfStudyConfirms: 0.25,
+    studyVendorEngaged: 'Association Reserves',
+    studyPaid: 3_405,
+  },
+
+  subsequentEvents: [
+    { title: 'All units sold', detail: 'Management reports every unit is sold, so developer assessment billing is ending; September’s bill covered two units.' },
+    { title: 'Developer payment for sidewalk-related costs', detail: 'Management reports a one-time developer payment is being deposited to the reserve account in October. Hold it as a separately tracked, designated fund: it is not operating income and should not count toward reserve adequacy.' },
+  ],
+  midBlockAgreement: {
+    payment: 103_191,
+    recordedOn: 'October 2, 2025',
+    cycleYears: 10,
+    annualCpiCap: 0.035,
+    trigger: 'transfer of the Mid-Block facilities to the Mission Bay Maintenance Corporation',
+  },
+
+  deadlines: [
+    { date: 'Now', item: 'Stop payment and void the $143.9k duplicate insurance check (already requested)' },
+    { date: 'Oct 31', item: 'Otis elevator contract renews (≈$20.4k last year)' },
+    { date: 'Nov 2–Dec 2', item: 'Mail notice of any 2027 assessment increase (Civ. Code §5615)' },
+    { date: 'Nov 27', item: 'Insurance package renews (≈$144k last year)' },
+    { date: 'Dec 2', item: 'Distribute the 2027 budget report with reserve summary and disclosure form (§§5300, 5565, 5570)' },
+  ],
+
+  openItems: [
+    { item: 'Void checks older than 90 days', status: 'Not done', detail: '$143,885.94 insurance check plus six items ($2,736.53) still outstanding at Sep 30.' },
+    { item: 'MeterNet meter-read meeting', status: 'Open', detail: 'Requested for the week of Sep 21. September remittance is missing.' },
+    { item: 'Garage cost-center allocation', status: 'Open', detail: 'Accounting clarification pending. CC&R §6.9.2 requires separate accounting.' },
+    { item: 'Refund held deposits', status: 'Open', detail: '$6,550 held. In September, ten deposits ($2,700) moved to owner credits instead of being refunded.' },
+    { item: 'Suspense debit', status: 'Open', detail: '$5,298.26 since March; no activity.' },
+    { item: 'Unidentified receipts', status: 'Open', detail: '$3,786 (Aug, cleared Sep 1) and $1,778.80 (Jun) credited to expense with no payer.' },
+    { item: 'Reserve repayment', status: 'On track', detail: '$42,732 left = the unfunded Nov–Dec 2025 allocations. Two installments finish it.' },
+    { item: 'Mid-Block maintenance payment', status: 'Unscheduled', detail: '$103,191 due when the Mid-Block transfers to MBMC (date unknown), repeating every 10 years. Confirm timing and whether the developer payment funds it.' },
+    { item: 'Reserve study', status: 'Started', detail: 'Association Reserves paid $3,405 in September.' },
+  ],
+
+  recordsNeeded: [
+    'Socher Insurance Agency paid-in-full confirmation for the 2025–26 term, and who paid it',
+    'MeterNet monthly remittance statements and Jun–Nov 2025 read history',
+    'PG&E and CleanPowerSF bills, net-metering/interconnection status, and solar production data',
+    'Recology, Bay Alarm, and Superclean account statements for 2025–26',
+    'Action fee schedule and detail for admin, handyman, and payroll invoices',
+    'Insurance renewal quote and Otis renewal quote',
+    'Board-approved garage cost-center allocation method',
+    'Developer payment terms and deposit confirmation (October)',
+    'Mid-Block transfer timeline from the developer and Mission Bay Maintenance Corporation',
+  ],
+
   sourceDocuments: [
-    'Financial statement packages, June 2025 through June 2026 (previous review baseline)',
-    'July 2026 financial package: 48 pages, statements prepared August 25, 2026',
-    'August 2026 financial package: 43 pages, statements prepared September 8, 2026',
-    '2025 Annual Budget Report dated October 14, 2025',
-    '2026 Annual Budget Report dated November 2025',
-    'DRE budget worksheet dated April 24, 2023 and revised November 27, 2023',
-    'DRE budget review and supporting insurance estimate',
+    'Monthly financial packages, June 2025 through September 2026 (16 packages)',
+    'September 2026 package: 49 pages, statements prepared October 26, 2026',
+    '2025 and 2026 Annual Budget Reports',
+    'DRE budget worksheet dated April 24, 2023, revised November 27, 2023, and DRE budget review',
+    'Recorded CC&Rs and Rules & Regulations',
   ],
 } as const;
 
-const { reported, previousReview } = financialOverview;
-const monthsReported = reported.monthlyResults.length;
-const monthsRemaining = 12 - monthsReported;
-// Annualize integer cents so half-cent projections round consistently for display.
-const annualize = (amount: number) =>
-  Math.round(Math.round(amount * 100) * 12 / monthsReported) / 100;
+const { reported, reserves } = financialOverview;
+const monthsReported = reported.monthly2026.length;
+
+// 2027 margin model. Monthly baselines come from the normalized Jan–Sep 2026 run-rate
+// (one-offs removed, re-rated to current vendor prices). Everything is annual dollars.
+export const model2027Defaults = {
+  insuranceIncrease: 0.10,
+  inflation: 0.03,
+  waterIncrease: 0.04,
+  submeterRecovery: 0.95,
+  janitorial: 40_200,
+  restoreDeferredServices: true,
+  solarRestored: false,
+  electricitySpikePersists: false,
+  contingencyRate: 0.03,
+  reserveShare: 1,
+};
+
+export type Model2027Inputs = typeof model2027Defaults;
+
+const model2027Base = {
+  recurringMonthly: 20_831.92,
+  waterMonthly: 11_651,
+  electricityMonthly: 5_982,
+  refuseMonthly: 8_998,
+  insuranceAnnual: reported.insurance.package,
+  solarCreditAnnual: 48_355,
+  electricitySpikeAnnual: 28_800,
+  deferredServicesAnnual: 43_646,
+  garageRevenue: 51_000,
+  otherRevenue: 3_500,
+  memberAssessments: reported.memberAssessmentsBudget,
+  reserveContribution: reported.annualReserveContribution,
+};
+
+export function runModel2027(input: Model2027Inputs) {
+  const b = model2027Base;
+  const water = b.waterMonthly * 12 * (1 + input.waterIncrease);
+  const lines = {
+    recurring: b.recurringMonthly * 12 * (1 + input.inflation),
+    water,
+    insurance: b.insuranceAnnual * (1 + input.insuranceIncrease),
+    electricity:
+      b.electricityMonthly * 12 * (1 + input.inflation) -
+      (input.solarRestored ? b.solarCreditAnnual : 0) +
+      (input.electricitySpikePersists ? b.electricitySpikeAnnual : 0),
+    refuse: b.refuseMonthly * 12 * (1 + input.inflation),
+    janitorial: input.janitorial,
+    deferred: input.restoreDeferredServices ? b.deferredServicesAnnual : 0,
+  };
+  const operating = Object.values(lines).reduce((sum, value) => sum + value, 0);
+  const contingency = operating * input.contingencyRate;
+  const reserveFunding = b.reserveContribution * input.reserveShare;
+  const nonMemberRevenue = b.garageRevenue + water * input.submeterRecovery + b.otherRevenue;
+  const memberAssessmentsNeeded = operating + contingency + reserveFunding - nonMemberRevenue;
+  return {
+    lines,
+    operating: operating + contingency,
+    reserveFunding,
+    nonMemberRevenue,
+    memberAssessmentsNeeded,
+    increase: memberAssessmentsNeeded / b.memberAssessments - 1,
+  };
+}
+
+export const model2027Scenarios = [
+  { name: 'Conservative baseline', note: 'Insurance +10%, janitorial labor resumes, deferred services restart, no solar credit', input: {} },
+  { name: 'Solar credit restored', note: 'Rooftop system credited to the house meter', input: { solarRestored: true } },
+  { name: 'Solar + reserves −10%', note: 'The only reserve cut that passes every tested case', input: { solarRestored: true, reserveShare: 0.9 } },
+  { name: 'Solar + reserves −25%', note: 'Only if the study confirms the DRE table/bench error', input: { solarRestored: true, reserveShare: 0.75 } },
+  { name: 'Stress', note: 'Insurance +25%, janitorial at DRE rate, Sep–Oct usage spike persists, 80% submeter recovery', input: { insuranceIncrease: 0.25, janitorial: 69_797, electricitySpikePersists: true, submeterRecovery: 0.8 } },
+].map(scenario => ({ ...scenario, result: runModel2027({ ...model2027Defaults, ...scenario.input }) }));
+
+// November cash test: unrestricted operating cash after the Otis and insurance renewals.
+const septemberCashChange = -2_107.46;
+const typicalSubmeterRemittance = 11_600;
+export const insuranceCashTest = [false, true].flatMap(submeterResumes =>
+  [false, true].map(voided => {
+    const monthlyFlow = septemberCashChange + (submeterResumes ? typicalSubmeterRemittance : 0);
+    const beforeRenewals =
+      reported.unrestrictedOperatingCash +
+      monthlyFlow * 2 +
+      (submeterResumes ? typicalSubmeterRemittance : 0) +
+      (voided ? reported.insurance.duplicateCheck : 0);
+    const afterRenewal = (increase: number) =>
+      beforeRenewals - reported.elevatorContract.annual - reported.insurance.package * (1 + increase);
+    return {
+      submeterResumes,
+      voided,
+      flat: afterRenewal(0),
+      plus10: afterRenewal(0.1),
+      plus25: afterRenewal(0.25),
+    };
+  }),
+);
+
+const sum = (values: readonly number[]) => values.reduce((total, value) => total + value, 0);
 
 export const derivedFinancials = {
   monthsReported,
-  monthsRemaining,
-  ytdOperatingMargin: reported.ytdSurplus / reported.ytdRevenue,
-  ytdRevenueVariance: reported.ytdRevenue - reported.ytdBudgetRevenue,
-  ytdExpenseVariance: reported.ytdBudgetExpenses - reported.ytdExpenses,
-  surplusSincePreviousReview: reported.ytdSurplus - previousReview.surplus,
-  operatingCashIncrease:
-    reported.unrestrictedOperatingCash - previousReview.unrestrictedOperatingCash,
-  reserveRepaymentsSincePreviousReview:
-    previousReview.reserveDueFromOperating - reported.reserveDueFromOperating,
-  latestMonthSurplus: reported.latestMonthRevenue - reported.latestMonthExpenses,
-  latestMonthSurplusExcludingMaintenanceCredit:
-    reported.latestMonthRevenue - reported.latestMonthExpenses - reported.unclearedMaintenanceCredit,
-  monthlyRevenueRunRate: reported.ytdRevenue / monthsReported,
-  monthlyExpenseRunRate: reported.ytdExpenses / monthsReported,
-  monthlySurplusRunRate: reported.ytdSurplus / monthsReported,
-  monthlyNonreserveExpenseRunRate:
-    (reported.ytdExpenses - reported.ytdReserveFundingIncludingInterest) / monthsReported,
-  operatingCashMonths:
-    reported.unrestrictedOperatingCash /
-    ((reported.ytdExpenses - reported.ytdReserveFundingIncludingInterest) / monthsReported),
-  liquidOperatingAssets:
-    reported.unrestrictedOperatingCash + reported.accountsReceivable,
+  monthlyResults: reported.monthly2026.map(m => ({ ...m, result: m.revenue - m.expenses })),
+  ytdBudgetVariance: reported.ytdRevenue - reported.ytdExpenses,
+  reserveShareOfBudget: reported.annualReserveContribution / reported.annualBudget,
+  reserveShareOfAssessments:
+    reported.annualReserveContribution /
+    (reported.memberAssessmentsBudget + reported.garageAssessmentsBudget),
   reserveBankedShare: reported.reserveBankCash / reported.reserveFundBalance,
-  reserveInterfundShare:
-    reported.reserveDueFromOperating / reported.reserveFundBalance,
-  annualRevenueAtYtdPace: annualize(reported.ytdRevenue),
-  annualExpensesAtYtdPace: annualize(reported.ytdExpenses),
-  annualSurplusAtYtdPace: annualize(reported.ytdSurplus),
-  annualReserveAllocationIfContinued: reported.monthlyReserveAllocation * 12,
-  budgetRemainderRevenue:
-    reported.ytdRevenue + reported.monthlyBudgetUsedInStatements * monthsRemaining,
-  budgetRemainderExpenses:
-    reported.ytdExpenses + reported.monthlyBudgetUsedInStatements * monthsRemaining,
-  budgetRemainderRevenueStress:
-    reported.ytdRevenue + reported.monthlyBudgetUsedInStatements * monthsRemaining * 0.95,
-  latestMonthPaceRevenue: reported.ytdRevenue + reported.latestMonthRevenue * monthsRemaining,
-  // Keep reported YTD actuals; do not repeat August's uncleared credit in future months.
-  latestMonthPaceExpenses:
-    reported.ytdExpenses +
-    (reported.latestMonthExpenses + reported.unclearedMaintenanceCredit) * monthsRemaining,
-  waterReimbursementsMonthlyAverage: reported.ytdWaterReimbursements / monthsReported,
-  waterReimbursementShortfall:
-    reported.ytdWaterReimbursementBudget - reported.ytdWaterReimbursements,
-  grossUtilitiesMonthlyAverage: reported.grossUtilitiesYtd / monthsReported,
-  ytdNetUtilitiesMonthlyAverage:
-    (reported.grossUtilitiesYtd - reported.ytdWaterReimbursements) / monthsReported,
-  fullOccupancyIllustrativeNetUtilities:
-    reported.grossUtilitiesYtd / monthsReported - reported.fullOccupancyWaterBudgetMonthly,
-  waterRecoveryAgainstFullOccupancyBudget:
-    (reported.ytdWaterReimbursements / monthsReported) /
-    reported.fullOccupancyWaterBudgetMonthly,
-  remainingAtLatestClosingLog:
-    financialOverview.units.total -
-    financialOverview.units.closedAtLatestClosingLog,
-  closingShareAtLatestClosingLog:
-    financialOverview.units.closedAtLatestClosingLog /
-    financialOverview.units.total,
-  adjustedYtdSurplusIfSuspenseIsExpense:
-    reported.ytdSurplus - reported.suspenseDebit,
-  operatingEquityAtPeriodEnd:
-    reported.netIncome2025 - reported.currentYearAdjustment + reported.ytdSurplus,
-  totalLiabilities:
-    reported.prepaidAssessments + reported.refundableDeposits - reported.suspenseDebit,
-  insurancePackageMonthly: reported.insurancePackageTotal / 12,
+  unrestrictedCashIfVoided:
+    reported.unrestrictedOperatingCash + reported.insurance.duplicateCheck,
+  monthlyNonreserveExpense:
+    (reported.ytdExpenses - reported.ytdReserveFunding) / monthsReported,
+  onePercentOfAssessments: reported.memberAssessmentsBudget / 100,
+  reserveCutValue: (share: number) => reported.generalReserveContribution * share,
+  submeterWaterTotal: sum(financialOverview.submeterHistory.map(m => m.water)),
+  submeterRemittedTotal: sum(financialOverview.submeterHistory.map(m => m.remitted)),
+  septemberWithoutMissingRemittance:
+    reported.monthly2026[8].revenue - reported.monthly2026[8].expenses + typicalSubmeterRemittance,
+  dreCorrectionShare: reserves.dreTablesAndBenches / reported.generalReserveContribution,
 } as const;
+
+// Walk from the 2026 pace (Jan–Sep surplus annualized) to the 2027 result at current assessments.
+// The final line is the residual so the bridge always reconciles to the model.
+export function bridge2027(input: Model2027Inputs) {
+  const b = model2027Base;
+  const model = runModel2027(input);
+  const start = (reported.ytdSurplus * 12) / monthsReported;
+  const end = b.memberAssessments - model.memberAssessmentsNeeded;
+  const contingency = model.operating - Object.values(model.lines).reduce((total, value) => total + value, 0);
+  const items = [
+    { label: 'Janitorial labor resumes', value: -input.janitorial },
+    { label: 'Deferred services restart', value: input.restoreDeferredServices ? -b.deferredServicesAnnual : 0 },
+    { label: `Insurance renewal +${Math.round(input.insuranceIncrease * 100)}%`, value: -b.insuranceAnnual * input.insuranceIncrease },
+    { label: `Contingency (${Math.round(input.contingencyRate * 100)}%)`, value: -contingency },
+    { label: 'Solar credit restored', value: input.solarRestored ? b.solarCreditAnnual : 0 },
+    { label: 'Sep–Oct usage spike persists', value: input.electricitySpikePersists ? -b.electricitySpikeAnnual : 0 },
+    { label: 'Reserve contribution change', value: b.reserveContribution * (1 - input.reserveShare) },
+  ].filter(item => Math.round(item.value) !== 0);
+  items.push({
+    label: 'Rate step-ups, inflation, one-offs (net)',
+    value: end - start - items.reduce((total, item) => total + item.value, 0),
+  });
+  return { start, items, end };
+}

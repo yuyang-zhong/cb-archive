@@ -1,10 +1,37 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { derivedFinancials, financialOverview } from '../../data/financialOverview';
+import {
+	bridge2027,
+	derivedFinancials,
+	financialOverview,
+	insuranceCashTest,
+	model2027Defaults,
+	model2027Scenarios,
+	runModel2027,
+} from '../../data/financialOverview';
 
-const { reported, units, watchItems, sourceDocuments, asOf, reviewedOn, latestMonth } = financialOverview;
+const {
+	reported,
+	asOf,
+	reviewedOn,
+	statementsPreparedOn,
+	deadlines,
+	receivableGaps,
+	spendingIncreases,
+	unpaidBudgetLines,
+	codingFixes,
+	garageCostCenter,
+	reserves,
+	openItems,
+	recordsNeeded,
+	sourceDocuments,
+	submeterHistory,
+	submeterGap,
+	subsequentEvents,
+	midBlockAgreement,
+} = financialOverview;
 
-const currency = (value: number, digits = 2) =>
+const currency = (value: number, digits = 0) =>
 	new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: 'USD',
@@ -19,496 +46,573 @@ const percent = (value: number, digits = 1) =>
 		maximumFractionDigits: digits,
 	}).format(value);
 
-const priorityClass = (priority: string) => {
-	if (priority === 'High') return 'bg-rose-100 text-rose-700 border-rose-200';
-	if (priority === 'Medium') return 'bg-amber-100 text-amber-700 border-amber-200';
-	return 'bg-slate-100 text-slate-700 border-slate-200';
+// $40.6k / −$17.6k style for tiles and labels.
+const compact = (value: number) => {
+	const sign = value < 0 ? '−' : '';
+	const abs = Math.abs(value);
+	return abs >= 1000 ? `${sign}$${(abs / 1000).toFixed(1)}k` : `${sign}$${Math.round(abs)}`;
+};
+const signed = (value: number) => (value > 0 ? '+' : '') + compact(value);
+const signedPercent = (value: number) => (value > 0 ? '+' : value < 0 ? '−' : '') + percent(Math.abs(value));
+
+const statusClass: Record<string, string> = {
+	Missing: 'bg-rose-50 text-rose-800 border-rose-200',
+	'Not done': 'bg-rose-50 text-rose-800 border-rose-200',
+	Verify: 'bg-amber-50 text-amber-900 border-amber-200',
+	Ask: 'bg-amber-50 text-amber-900 border-amber-200',
+	Open: 'bg-amber-50 text-amber-900 border-amber-200',
+	Unscheduled: 'bg-slate-100 text-slate-700 border-slate-200',
+	'On track': 'bg-emerald-50 text-emerald-800 border-emerald-200',
+	Started: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+};
+const statusIcon: Record<string, string> = {
+	Missing: '✕', 'Not done': '✕', Verify: '!', Ask: '?', Open: '!', Unscheduled: '…', 'On track': '✓', Started: '✓',
 };
 
-const projectionScenarios = [
-	{
-		name: 'YTD pace repeats',
-		assumption: 'September–December repeat the January–August monthly average',
-		revenue: derivedFinancials.annualRevenueAtYtdPace,
-		expenses: derivedFinancials.annualExpensesAtYtdPace,
-	},
-	{
-		name: 'Budget for September–December',
-		assumption: 'Keep YTD actuals; both revenue and expense return to monthly budget',
-		revenue: derivedFinancials.budgetRemainderRevenue,
-		expenses: derivedFinancials.budgetRemainderExpenses,
-	},
-	{
-		name: '5% remaining revenue stress',
-		assumption: 'Keep YTD actuals; September–December revenue is 5% below budget and expense is on budget',
-		revenue: derivedFinancials.budgetRemainderRevenueStress,
-		expenses: derivedFinancials.budgetRemainderExpenses,
-	},
-	{
-		name: 'August pace without repeat credit',
-		assumption: 'Keep YTD actuals; September–December repeat August revenue and expense with the $3,786 maintenance credit added back to future expense',
-		revenue: derivedFinancials.latestMonthPaceRevenue,
-		expenses: derivedFinancials.latestMonthPaceExpenses,
-	},
-].map(scenario => ({ ...scenario, result: scenario.revenue - scenario.expenses }));
+const ink = { primary: '#0b0b0b', secondary: '#52514e', muted: '#898781', grid: '#e1e0d9', axis: '#c3c2b7' };
+const positiveHue = '#2a78d6';
+const negativeHue = '#e34948';
+const contextHue = '#a8a69f';
+
+// Column path with a 4px rounded data end and a square baseline end.
+const columnPath = (x: number, width: number, from: number, to: number) => {
+	const radius = Math.min(4, Math.abs(to - from), width / 2);
+	if (to < from) {
+		return `M${x},${from}V${to + radius}Q${x},${to} ${x + radius},${to}H${x + width - radius}Q${x + width},${to} ${x + width},${to + radius}V${from}Z`;
+	}
+	return `M${x},${from}V${to - radius}Q${x},${to} ${x + radius},${to}H${x + width - radius}Q${x + width},${to} ${x + width},${to - radius}V${from}Z`;
+};
+
+// Monthly result chart (diverging around zero).
+const results = derivedFinancials.monthlyResults;
+const resultChart = { width: 360, height: 176, top: 18, bottom: 22, left: 34, right: 4, max: 20_000 };
+const resultPlotHeight = resultChart.height - resultChart.top - resultChart.bottom;
+const resultY = (value: number) =>
+	resultChart.top + resultPlotHeight / 2 - (value / resultChart.max) * (resultPlotHeight / 2);
+const resultBand = (resultChart.width - resultChart.left - resultChart.right) / results.length;
+const resultBarWidth = Math.min(24, resultBand * 0.62);
+const labeledMonths = new Set(['Apr', 'Sep']);
+
+// Water cost vs. MeterNet remittance (one dollar axis).
+const waterChart = { width: 640, height: 220, top: 16, bottom: 26, left: 40, right: 132, max: 18_000 };
+const waterPlotHeight = waterChart.height - waterChart.top - waterChart.bottom;
+const waterStep = (waterChart.width - waterChart.left - waterChart.right) / (submeterHistory.length - 1);
+const waterX = (index: number) => waterChart.left + index * waterStep;
+const waterY = (value: number) => waterChart.top + waterPlotHeight - (value / waterChart.max) * waterPlotHeight;
+const linePath = (key: 'water' | 'remitted') =>
+	submeterHistory.map((point, index) => `${index ? 'L' : 'M'}${waterX(index).toFixed(1)},${waterY(point[key]).toFixed(1)}`).join('');
+const lastWater = submeterHistory[submeterHistory.length - 1];
+
+const overruns = spendingIncreases
+	.map(row => ({ ...row, over: row.current - row.budget }))
+	.sort((a, b) => b.over - a.over);
+const maxOverrun = Math.max(...overruns.map(row => row.over));
+const totalOverrun = overruns.reduce((total, row) => total + row.over, 0);
+
+const tiers = [
+	{ key: 'missing', title: 'Not received' },
+	{ key: 'recover', title: 'Verify, then recover' },
+	{ key: 'unrealized', title: 'Budgeted benefit never received' },
+	{ key: 'question', title: 'Ask management' },
+];
+
+const cashRows = insuranceCashTest.map(row => ({
+	...row,
+	label: `${row.submeterResumes ? 'MeterNet resumes' : 'MeterNet still missing'} · ${row.voided ? 'check voided' : 'check not voided'}`,
+}));
+
+const baseline = runModel2027(model2027Defaults);
+const baselineBridge = bridge2027(model2027Defaults);
+const averageMonthlyAssessment = reported.memberAssessmentsBudget / financialOverview.units.total / 12;
+const meterMax = 0.25;
 ---
 
 <BaseLayout
-	title="Financial Position Review"
-	description={`Source-verified review of China Basin HOA financial information through ${asOf}.`}
+	title="Financial Dashboard"
+	description={`China Basin HOA financial dashboard: statements through ${asOf}, insurance cash test, receivables, spending, coding fixes, reserves, and a 2027 margin model.`}
 >
-	<header class="mb-10 max-w-4xl">
-		<div class="flex flex-wrap items-center gap-3 mb-4">
-			<span class="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">Reviewed {reviewedOn}</span>
-			<span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-700">Statements reviewed through {asOf}</span>
-			<span class="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-800">Independent review · not an audit</span>
+	<header class="mb-8 max-w-4xl">
+		<div class="flex flex-wrap gap-2 mb-4 text-xs font-bold uppercase tracking-wider">
+			<span class="rounded-full bg-slate-900 px-3 py-1 text-white">Through {asOf}</span>
+			<span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-700">Prepared {statementsPreparedOn.replace(', 2026', '')} · 26-day lag</span>
+			<span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-700">Reviewed {reviewedOn.replace(', 2026', '')}</span>
+			<span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-amber-800">Approval not verified · not an audit</span>
 		</div>
-		<ytd class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-950 mb-4">Financial position review</ytd>
-		<p class="text-lg text-slate-600 leading-relaxed">
-			A source-checked accounting, data, and community-association review of the June 2025–August 2026 statements, the budget packets, and the reserve materials supplied for this project.
-		</p>
+		<h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-950 mb-4">Financial dashboard</h1>
+		<ul class="space-y-2 text-slate-700 leading-relaxed">
+			<li><strong class="text-slate-950">September lost {compact(reported.monthly2026[8].expenses - reported.monthly2026[8].revenue)}</strong>, mainly because the MeterNet water remittance never arrived.</li>
+			<li><strong class="text-slate-950">The Nov 27 insurance renewal is affordable only if the duplicate {compact(reported.insurance.duplicateCheck)} check is voided first.</strong></li>
+			<li><strong class="text-slate-950">2027 needs about {signedPercent(baseline.increase)}</strong> at today’s costs; restoring the solar credit and trimming reserves 10% brings it near {signedPercent(model2027Scenarios[2].result.increase)}.</li>
+		</ul>
 	</header>
 
-	<div class="space-y-12">
-		<section class="rounded-2xl border border-blue-200 bg-blue-50 p-5 md:flex md:items-start md:justify-between md:gap-8" aria-labelledby="reporting-lag">
-			<div class="max-w-3xl">
-				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Reporting status</p>
-				<h2 id="reporting-lag" class="text-lg font-bold text-blue-950">July and August are included; all completed months are available</h2>
-				<p class="text-sm text-blue-900/80 leading-relaxed mt-2">The supplied packages now report through August 31, a 14-day statement lag at the September 14 review. September is still in progress, so no completed month is missing. July statements were prepared August 25 and August statements September 8. The scenarios use January–August actuals; board approval was not independently verified.</p>
+	<div class="space-y-10">
+		<section aria-labelledby="dates">
+			<h2 id="dates" class="text-xs font-bold uppercase tracking-[0.18em] text-rose-700 mb-3">Board calendar</h2>
+			<ol class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+				{deadlines.map(deadline => (
+					<li class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+						<p class="text-sm font-extrabold text-slate-950">{deadline.date}</p>
+						<p class="text-xs text-slate-600 mt-1 leading-relaxed">{deadline.item}</p>
+					</li>
+				))}
+			</ol>
+		</section>
+
+		<section aria-label="Key figures" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+			<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+				<p class="text-sm text-slate-500">YTD net income</p>
+				<p class="text-3xl font-bold text-slate-950 mt-1">{compact(reported.ytdSurplus)}</p>
+				<p class="text-xs text-slate-600 mt-2">September {compact(reported.monthly2026[8].revenue - reported.monthly2026[8].expenses)} · August YTD was {compact(financialOverview.previousReview.ytdSurplus)}</p>
 			</div>
-			<div class="mt-4 md:mt-0 md:text-right flex-shrink-0">
-				<p class="text-3xl font-extrabold text-blue-900">14 days</p>
-				<p class="text-xs font-semibold uppercase tracking-wider text-blue-700">since the statement cutoff</p>
+			<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+				<p class="text-sm text-slate-500">Unrestricted operating cash</p>
+				<p class="text-3xl font-bold text-slate-950 mt-1">{compact(reported.unrestrictedOperatingCash)}</p>
+				<p class="text-xs text-slate-600 mt-2">{compact(derivedFinancials.unrestrictedCashIfVoided)} if the duplicate check is voided</p>
+			</div>
+			<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+				<p class="text-sm text-slate-500">Reserve fund</p>
+				<p class="text-3xl font-bold text-slate-950 mt-1">{compact(reported.reserveFundBalance)}</p>
+				<p class="text-xs text-slate-600 mt-2">{percent(derivedFinancials.reserveShareOfBudget)} of the budget is reserve funding</p>
+			</div>
+			<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+				<p class="text-sm text-slate-500">Still owed to reserves by operating</p>
+				<p class="text-3xl font-bold text-slate-950 mt-1">{compact(reported.reserveDueFromOperating)}</p>
+				<p class="text-xs text-slate-600 mt-2">Unfunded Nov–Dec 2025; two installments left</p>
 			</div>
 		</section>
 
-		<section class="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-blue-50 p-6 md:p-8 shadow-sm">
-			<div class="grid gap-8 lg:grid-cols-[1.15fr_1fr] lg:items-start">
+		<section aria-labelledby="monthly" class="rounded-2xl border border-slate-200 bg-white p-5 md:p-6 shadow-sm">
+			<div class="grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-center">
 				<div>
-					<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-3">Professional assessment</p>
-					<h2 class="text-2xl md:text-3xl font-extrabold text-slate-950 mb-4">Cash and reserves improved through August; unresolved entries still qualify the surplus</h2>
-					<p class="text-slate-700 leading-relaxed mb-4">
-						January–August produced a {currency(reported.ytdSurplus)} reported surplus: the {currency(derivedFinancials.ytdExpenseVariance)} favorable expense variance exceeded the {currency(Math.abs(derivedFinancials.ytdRevenueVariance))} revenue shortfall. July and August added {currency(derivedFinancials.surplusSincePreviousReview)}. August’s result includes a {currency(reported.unclearedMaintenanceCredit)} maintenance credit awaiting bank clearance, and budget mapping and invoice timing still limit how much of the variance can be treated as recurring savings.
-					</p>
-					<p class="text-sm text-slate-600 leading-relaxed">
-						Unrestricted operating cash rose by {currency(derivedFinancials.operatingCashIncrease)} since June to {currency(reported.unrestrictedOperatingCash)}, or {derivedFinancials.operatingCashMonths.toFixed(1)} months of average nonreserve expenses. August included a {currency(derivedFinancials.reserveRepaymentsSincePreviousReview)} repayment in addition to normal reserve funding. Operating still owes reserves {currency(reported.reserveDueFromOperating)}; the reported cash also includes the uncleared maintenance receipt.
-					</p>
+					<h2 id="monthly" class="text-xl font-bold text-slate-950">Monthly net income, 2026</h2>
+					<p class="text-sm text-slate-600 mt-2 leading-relaxed">September is the worst month of the year. With a typical MeterNet remittance it would have been about {compact(derivedFinancials.septemberWithoutMissingRemittance)}; refuse, fire monitoring, and the first reserve-study invoice ({currency(reserves.studyPaid)}) did the rest.</p>
 				</div>
-
-				<div class="grid sm:grid-cols-2 gap-3" aria-label="Financial condition by area">
-					<div class="rounded-2xl border border-amber-200 bg-white p-4">
-						<span class="text-xs font-bold uppercase tracking-wider text-amber-700">Operations</span>
-						<p class="text-lg font-extrabold text-slate-950 mt-1">Positive, qualified</p>
-						<p class="text-xs text-slate-500 mt-1">{currency(reported.ytdSurplus)} YTD surplus; expense timing and coding still need support.</p>
-					</div>
-					<div class="rounded-2xl border border-amber-200 bg-white p-4">
-						<span class="text-xs font-bold uppercase tracking-wider text-amber-700">Liquidity</span>
-						<p class="text-lg font-extrabold text-slate-950 mt-1">Improving</p>
-						<p class="text-xs text-slate-500 mt-1">{derivedFinancials.operatingCashMonths.toFixed(1)} months of nonreserve expense pace; plan for upcoming renewals.</p>
-					</div>
-					<div class="rounded-2xl border border-blue-200 bg-white p-4">
-						<span class="text-xs font-bold uppercase tracking-wider text-blue-700">Reserves</span>
-						<p class="text-lg font-extrabold text-slate-950 mt-1">Repayment progress</p>
-						<p class="text-xs text-slate-500 mt-1">{percent(derivedFinancials.reserveBankedShare)} is now banked; the first property-specific study remains due.</p>
-					</div>
-					<div class="rounded-2xl border border-rose-200 bg-white p-4">
-						<span class="text-xs font-bold uppercase tracking-wider text-rose-700">Reporting controls</span>
-						<p class="text-lg font-extrabold text-slate-950 mt-1">Needs correction</p>
-						<p class="text-xs text-slate-500 mt-1">Budget mapping, suspense, the maintenance credit, and a nine-month-old check need support.</p>
-					</div>
-					</div>
-				</div>
-
-				<div class="mt-8 border-t border-slate-200 pt-8" aria-labelledby="board-transition-brief">
-					<div class="mb-5 max-w-4xl">
-						<p class="text-xs font-bold uppercase tracking-[0.18em] text-indigo-700 mb-2">Incoming owner-seated board</p>
-						<h3 id="board-transition-brief" class="text-xl md:text-2xl font-extrabold text-slate-950">Key takeaways and post-election transition priorities</h3>
-						<p class="text-sm text-slate-600 leading-relaxed mt-3">With developer control ending after the election, the first owner-seated board should treat its initial 60–90 days as a formal financial, records, and operational turnover—not merely the next routine board cycle.</p>
-					</div>
-
-					<div class="grid lg:grid-cols-2 gap-5">
-						<div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 md:p-6">
-							<h4 class="font-extrabold text-indigo-950 mb-4">Key takeaways for incoming directors</h4>
-							<ul class="space-y-3 text-sm text-indigo-950/80">
-								<li class="flex gap-3"><span class="font-black text-indigo-600">01</span><span><strong class="text-indigo-950">Reported income is not the same as available cash.</strong> The YTD surplus is positive, but unrestricted operating cash is {currency(reported.unrestrictedOperatingCash)} after the reserve obligation.</span></li>
-								<li class="flex gap-3"><span class="font-black text-indigo-600">02</span><span><strong class="text-indigo-950">Reserve repayment is working but incomplete.</strong> The amount due from operating fell to {currency(reported.reserveDueFromOperating)}, or {percent(derivedFinancials.reserveInterfundShare)} of the reserve fund.</span></li>
-								<li class="flex gap-3"><span class="font-black text-indigo-600">03</span><span><strong class="text-indigo-950">Reporting is current through August; control exceptions remain.</strong> July and August packages are available. Suspense, the stale insurance check, the new maintenance credit, and account-level budget mapping require follow-up.</span></li>
-								<li class="flex gap-3"><span class="font-black text-indigo-600">04</span><span><strong class="text-indigo-950">The reserve program has reached its first-study transition.</strong> The DRE worksheet is the correct new-development baseline, but it should now be replaced by a property-specific visual study that reflects actual component conditions.</span></li>
-								<li class="flex gap-3"><span class="font-black text-indigo-600">05</span><span><strong class="text-indigo-950">Developer closeout evidence must be preserved.</strong> Billing adjustments, warranties, open construction items, vendor claims, and responsibility for early-life repairs should be resolved before institutional knowledge is lost.</span></li>
-							</ul>
-						</div>
-
-						<div class="rounded-2xl border border-blue-200 bg-white p-5 md:p-6 shadow-sm">
-							<h4 class="font-extrabold text-slate-950 mb-4">Proposed action items</h4>
-							<ol class="space-y-3 text-sm text-slate-600">
-								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">First meeting · Secure control.</strong> Confirm officers, bank signers, approval limits, and direct board access to every operating, reserve, payment, accounting, insurance, and owner-record system. Access should not depend solely on management or former developer representatives.</li>
-								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">First meeting · Accept a documented turnover inventory.</strong> Require bank reconciliations, general ledgers, receivable and payable aging, open checks, tax and CPA files, contracts, insurance, warranties, claims, reserve records, minutes, and a list of unresolved developer obligations with accountable owners and due dates.</li>
-								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 30 days · Establish the true cash position.</strong> Continue the reserve repayment plan, resolve the suspense debit, stale insurance check, and uncleared maintenance receipt, and adopt a minimum unrestricted operating-cash floor.</li>
-								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 30 days · Lock in timely reporting.</strong> Record the board’s review status for the supplied packages, complete September on a recurring calendar, and require written explanations for material variances and unreconciled items.</li>
-								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 60 days · Correct the financial plan.</strong> Identify the adopted 12-month 2026 budget, correct the exhibits, commission the first independent property-specific reserve study, and use the DRE contribution schedule as the interim index until the board adopts the new study and funding plan.</li>
-								<li class="rounded-xl border border-slate-200 p-3"><strong class="text-blue-800">Within 90 days · Independent closeout review.</strong> Ask the Association's CPA and counsel to review year-end adjustments, tax and statutory reporting, turnover completeness, contracts, warranty recovery, and any continuing developer obligations.</li>
-							</ol>
-						</div>
-					</div>
-				</div>
-			</section>
-
-		<section aria-labelledby="reported-snapshot">
-			<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 border-b border-slate-200 pb-3 mb-6">
-				<div>
-					<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">{latestMonth} statement snapshot</p>
-					<h2 id="reported-snapshot" class="text-2xl font-bold text-slate-950">The balances, correctly classified</h2>
-				</div>
-				<p class="text-xs text-slate-500 max-w-md md:text-right">Reconciled to the August balance sheet, income statement, and fund schedules.</p>
+				<figure>
+					<svg viewBox={`0 0 ${resultChart.width} ${resultChart.height}`} class="w-full h-auto" role="img" aria-label="Monthly net income January to September 2026">
+						{[-20_000, -10_000, 0, 10_000, 20_000].map(tick => (
+							<g>
+								<line x1={resultChart.left} x2={resultChart.width - resultChart.right} y1={resultY(tick)} y2={resultY(tick)} stroke={tick === 0 ? ink.axis : ink.grid} stroke-width="1" />
+								<text x={resultChart.left - 6} y={resultY(tick) + 3} text-anchor="end" font-size="10" fill={ink.muted} style="font-variant-numeric: tabular-nums">{tick === 0 ? '0' : `${tick / 1000}K`}</text>
+							</g>
+						))}
+						{results.map((month, index) => {
+							const x = resultChart.left + index * resultBand + (resultBand - resultBarWidth) / 2;
+							const top = resultY(month.result);
+							const zero = resultY(0);
+							return (
+								<g>
+									<path d={columnPath(x, resultBarWidth, zero, top)} fill={month.result >= 0 ? positiveHue : negativeHue}>
+										<title>{`${month.month} 2026: ${currency(month.result)} (revenue ${currency(month.revenue)}, expenses ${currency(month.expenses)})`}</title>
+									</path>
+									<text x={x + resultBarWidth / 2} y={resultChart.height - 6} text-anchor="middle" font-size="10" fill={ink.muted}>{month.month}</text>
+									{labeledMonths.has(month.month) && (
+										<text x={x + resultBarWidth / 2} y={month.result >= 0 ? top - 4 : top + 11} text-anchor="middle" font-size="10" font-weight="600" fill={ink.primary}>{signed(month.result)}</text>
+									)}
+								</g>
+							);
+						})}
+					</svg>
+					<figcaption class="sr-only">Positive months in blue, negative in red.</figcaption>
+				</figure>
 			</div>
-
-			<div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
-				<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-					<p class="text-xs font-bold uppercase tracking-wider text-slate-500">YTD reported surplus</p>
-					<p class="text-3xl font-extrabold text-emerald-700 mt-2">{currency(reported.ytdSurplus)}</p>
-					<p class="text-xs text-slate-500 mt-3 leading-relaxed">January–August: a {percent(derivedFinancials.ytdOperatingMargin)} margin, subject to the unresolved entries below.</p>
-				</div>
-				<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-					<p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total assets</p>
-					<p class="text-3xl font-extrabold text-blue-700 mt-2">{currency(reported.totalAssets)}</p>
-					<p class="text-xs text-slate-500 mt-3 leading-relaxed">Includes restricted reserves and {currency(reported.prepaidExpenses)} of prepaids; it is not freely spendable cash.</p>
-				</div>
-				<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-					<p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total reserve fund</p>
-					<p class="text-3xl font-extrabold text-blue-700 mt-2">{currency(reported.reserveFundBalance)}</p>
-					<p class="text-xs text-slate-500 mt-3 leading-relaxed">Includes {currency(reported.reserveBankCash)} in the reserve bank and {currency(reported.reserveDueFromOperating)} due from operating.</p>
-				</div>
-				<div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
-					<p class="text-xs font-bold uppercase tracking-wider text-amber-700">Unrestricted operating cash</p>
-					<p class="text-3xl font-extrabold text-amber-800 mt-2">{currency(reported.unrestrictedOperatingCash)}</p>
-					<p class="text-xs text-amber-900/70 mt-3 leading-relaxed">About {derivedFinancials.operatingCashMonths.toFixed(1)} months of YTD nonreserve expenses. Includes the {currency(reported.unclearedMaintenanceCredit)} receipt awaiting bank clearance.</p>
-				</div>
-			</div>
-		</section>
-
-		<section aria-labelledby="operating-performance">
-			<div class="border-b border-slate-200 pb-3 mb-6">
-				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Operating performance</p>
-				<h2 id="operating-performance" class="text-2xl font-bold text-slate-950">2025 was an appropriate partial startup year; 2026 is the first full 12-month model</h2>
-			</div>
-
-			<div class="grid lg:grid-cols-[1.25fr_0.75fr] gap-6">
-				<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-					<table class="w-full min-w-[680px] text-sm">
-						<thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
-							<tr><th class="px-5 py-4 font-bold">Period</th><th class="px-5 py-4 font-bold text-right">Revenue</th><th class="px-5 py-4 font-bold text-right">Expenses</th><th class="px-5 py-4 font-bold text-right">Net</th></tr>
-						</thead>
-						<tbody class="divide-y divide-slate-100 text-slate-700">
-							<tr>
-								<td class="px-5 py-4"><p class="font-bold text-slate-950">2025 startup actual</p><p class="text-xs text-slate-500 mt-1">The Association became operational around May; the statements and budget use seven operating months from June through December.</p></td>
-								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.revenue2025)}</td>
-								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.expenses2025)}</td>
-								<td class="px-5 py-4 text-right whitespace-nowrap font-extrabold text-emerald-700">+{currency(reported.netIncome2025)}</td>
-							</tr>
-							{[
-								{ month: 'July 2026', revenue: reported.julyRevenue, expenses: reported.julyExpenses },
-								{ month: 'August 2026', revenue: reported.latestMonthRevenue, expenses: reported.latestMonthExpenses },
-							].map(month => (
-								<tr>
-									<td class="px-5 py-4 font-bold text-slate-950">{month.month} actual</td>
-									<td class="px-5 py-4 text-right whitespace-nowrap">{currency(month.revenue)}</td>
-									<td class="px-5 py-4 text-right whitespace-nowrap">{currency(month.expenses)}</td>
-									<td class="px-5 py-4 text-right whitespace-nowrap font-extrabold text-emerald-700">+{currency(month.revenue - month.expenses)}</td>
-								</tr>
+			<details class="mt-4 text-sm">
+				<summary class="cursor-pointer font-semibold text-blue-800">Monthly table</summary>
+				<div class="overflow-x-auto mt-3">
+					<table class="w-full min-w-[480px] text-sm" style="font-variant-numeric: tabular-nums">
+						<thead class="text-left text-xs uppercase tracking-wider text-slate-500"><tr><th class="py-2">Month</th><th class="py-2 text-right">Revenue</th><th class="py-2 text-right">Expenses</th><th class="py-2 text-right">Net</th></tr></thead>
+						<tbody class="divide-y divide-slate-100">
+							{results.map(month => (
+								<tr><td class="py-1.5">{month.month}</td><td class="py-1.5 text-right">{currency(month.revenue, 2)}</td><td class="py-1.5 text-right">{currency(month.expenses, 2)}</td><td class="py-1.5 text-right font-semibold">{currency(month.result, 2)}</td></tr>
 							))}
-							<tr>
-								<td class="px-5 py-4"><p class="font-bold text-slate-950">YTD 2026 actual</p><p class="text-xs text-slate-500 mt-1">January–August; eight months.</p></td>
-								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.ytdRevenue)}</td>
-								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.ytdExpenses)}</td>
-								<td class="px-5 py-4 text-right whitespace-nowrap font-extrabold text-emerald-700">+{currency(reported.ytdSurplus)}</td>
-							</tr>
-							<tr class="bg-slate-50">
-								<td class="px-5 py-4"><p class="font-bold text-slate-950">YTD 2026 budget</p><p class="text-xs text-slate-500 mt-1">Break-even budget used by the monthly statements.</p></td>
-								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.ytdBudgetRevenue)}</td>
-								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(reported.ytdBudgetExpenses)}</td>
-								<td class="px-5 py-4 text-right whitespace-nowrap font-extrabold">{currency(0)}</td>
-							</tr>
+							<tr class="font-bold"><td class="py-1.5">Jan–Sep</td><td class="py-1.5 text-right">{currency(reported.ytdRevenue, 2)}</td><td class="py-1.5 text-right">{currency(reported.ytdExpenses, 2)}</td><td class="py-1.5 text-right">{currency(reported.ytdSurplus, 2)}</td></tr>
 						</tbody>
 					</table>
-					<div class="p-5 border-t border-slate-200 bg-blue-50 text-xs text-blue-950/75 leading-relaxed">
-						<strong>Interpretation:</strong> A seven-month model is appropriate for 2025 because the Association began operations late in the year. The {currency(reported.netIncome2025)} result should be evaluated as a valid partial-year startup result—not annualized or compared directly with a full 12-month year. The 2026 analysis uses the full-year budget and now compares eight months of actual activity with eight months of that operating model. July and August rows are included in the YTD total.
-					</div>
 				</div>
-
-				<div class="rounded-2xl border border-slate-200 bg-slate-950 text-white p-6 shadow-sm">
-					<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-300 mb-2">YTD monthly result</p>
-					<div class="space-y-3">
-						{reported.monthlyResults.map(month => (
-							<div class="flex items-center justify-between gap-4 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3">
-								<span class="text-sm text-slate-300">{month.month}</span>
-								<span class={`font-extrabold ${month.result >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>{month.result >= 0 ? '+' : ''}{currency(month.result)}</span>
-							</div>
-						))}
-					</div>
-					<p class="text-xs text-slate-400 mt-5 leading-relaxed">July added {currency(reported.monthlyResults[6].result)} and August added {currency(reported.monthlyResults[7].result)}. Excluding the {currency(reported.unclearedMaintenanceCredit)} maintenance credit, August’s result would be {currency(derivedFinancials.latestMonthSurplusExcludingMaintenanceCredit)}.</p>
-				</div>
-			</div>
-
-			<div class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950 leading-relaxed">
-			<strong>Equity bridge:</strong> August operating equity reconciles as {currency(reported.netIncome2025)} carried forward, less the {currency(reported.currentYearAdjustment)} current-year adjustment, plus {currency(reported.ytdSurplus)} of YTD income, for {currency(derivedFinancials.operatingEquityAtPeriodEnd)}. The adjustment is principally a {currency(16_357.24)} “2025 Developer Billing Adjustment,” plus prior-period reclasses, so the displayed 2025 line should not be treated as fully settled without the year-end review or audit.
-			</div>
+				<p class="text-xs text-slate-500 mt-2">Expenses include {currency(reported.monthlyReserveAllocation, 2)} of reserve funding each month. YTD budget was break-even at {currency(reported.ytdBudget, 2)}.</p>
+			</details>
 		</section>
 
-		<section aria-labelledby="cash-reconciliation">
-			<div class="border-b border-slate-200 pb-3 mb-6">
-				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Liquidity and fund accounting</p>
-				<h2 id="cash-reconciliation" class="text-2xl font-bold text-slate-950">Reserve repayment materially improved the cash mix, but operating still owes {currency(reported.reserveDueFromOperating)}</h2>
-			</div>
-
-			<div class="grid lg:grid-cols-[0.9fr_1.1fr] gap-6">
-				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-					<p class="text-xs font-bold uppercase tracking-wider text-slate-500">Operating bank reconciliation</p>
-					<dl class="mt-4 space-y-3 text-sm">
-						<div class="flex justify-between gap-4 border-b border-slate-100 pb-3"><dt class="text-slate-600">Operating bank ledger</dt><dd class="font-bold text-slate-950">{currency(reported.operatingBankCash)}</dd></div>
-						<div class="flex justify-between gap-4 border-b border-slate-100 pb-3"><dt class="text-slate-600">Less: due to reserve funds</dt><dd class="font-bold text-rose-700">({currency(reported.reserveDueFromOperating)})</dd></div>
-						<div class="flex justify-between gap-4"><dt class="font-bold text-slate-950">Unrestricted operating cash</dt><dd class="font-extrabold text-rose-700">{currency(reported.unrestrictedOperatingCash)}</dd></div>
-					</dl>
-					<p class="text-xs text-slate-500 mt-5 leading-relaxed">This is about {derivedFinancials.operatingCashMonths.toFixed(1)} months of average YTD expense excluding reserve funding. Adding reported receivables produces {currency(derivedFinancials.liquidOperatingAssets)} of liquid operating assets after the reported {currency(reported.allowanceForDoubtfulAccounts)} allowance. Prepaid assessments and refundable deposits remain obligations against this liquidity.</p>
-				</div>
-
-				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-					<div class="grid sm:grid-cols-3 gap-4">
-						<div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-							<p class="text-xs font-bold uppercase tracking-wider text-emerald-700">In reserve bank</p>
-							<p class="text-2xl font-extrabold text-emerald-800 mt-2">{currency(reported.reserveBankCash)}</p>
-							<p class="text-xs text-emerald-900/70 mt-1">{percent(derivedFinancials.reserveBankedShare)} of total reserves</p>
-						</div>
-						<div class="rounded-xl border border-rose-200 bg-rose-50 p-4">
-							<p class="text-xs font-bold uppercase tracking-wider text-rose-700">Due from operating</p>
-							<p class="text-2xl font-extrabold text-rose-800 mt-2">{currency(reported.reserveDueFromOperating)}</p>
-							<p class="text-xs text-rose-900/70 mt-1">{percent(derivedFinancials.reserveInterfundShare)} of total reserves</p>
-						</div>
-						<div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
-							<p class="text-xs font-bold uppercase tracking-wider text-blue-700">Total reserve fund</p>
-							<p class="text-2xl font-extrabold text-blue-800 mt-2">{currency(reported.reserveFundBalance)}</p>
-							<p class="text-xs text-blue-900/70 mt-1">Accounting balance, not adequacy</p>
-						</div>
-					</div>
-					<p class="text-xs text-slate-500 mt-5 leading-relaxed">The schedule traces {currency(106_829.60)} to the October 2025 prior-management balance and {currency(42_732)} to unfunded November–December allocations, less four {currency(reported.monthlyReserveAllocation)} repayments in February, April, June, and August, totaling {currency(reported.reserveRepaymentsToDate)}. Current 2026 allocations have reached the reserve bank; the older {currency(reported.reserveDueFromOperating)} balance remains outstanding.</p>
-				</div>
-			</div>
-
-			<div class="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-5 text-sm text-blue-950 leading-relaxed">
-				<strong>Monthly board review:</strong> California Civil Code <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=5500." target="_blank" rel="noreferrer">§ 5500</a> calls for monthly review of operating and reserve reconciliations, bank statements, budget-to-actual results, income and expenses, the check register, general ledger, and delinquency reports. The reserve receivable, suspense debit, long-outstanding insurance check, uncleared maintenance receipt, and budget mapping should each appear in that review until cleared.
-			</div>
-		</section>
-
-		<section aria-labelledby="run-rate-model">
-			<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 border-b border-slate-200 pb-3 mb-6">
-				<div>
-					<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Projection model</p>
-					<h2 id="run-rate-model" class="text-2xl font-bold text-slate-950">A range is more credible than one annualized number</h2>
-				</div>
-				<p class="text-xs text-slate-500 max-w-md md:text-right">Models based on supplied January–August actuals and four remaining months. They are not the budget and are not predictions.</p>
-			</div>
-
-			<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-				<table class="w-full min-w-[760px] text-sm">
-					<thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
-						<tr><th class="px-5 py-4 font-bold">Full-year scenario</th><th class="px-5 py-4 font-bold text-right">Revenue</th><th class="px-5 py-4 font-bold text-right">Expenses</th><th class="px-5 py-4 font-bold text-right">Result</th></tr>
+		<section aria-labelledby="cash-test" class="rounded-2xl border border-rose-200 bg-rose-50/40 p-5 md:p-6">
+			<p class="text-xs font-bold uppercase tracking-[0.18em] text-rose-700 mb-1">November cash test</p>
+			<h2 id="cash-test" class="text-2xl font-bold text-slate-950">Void the duplicate check before paying the renewal</h2>
+			<p class="text-sm text-slate-700 mt-2 leading-relaxed max-w-3xl">The Association understands the developer paid the 2025–26 premium. The Association’s own {currency(reported.insurance.duplicateCheck, 2)} check to the broker, dated {reported.insurance.duplicateCheckDated}, has not cleared in {reported.insurance.duplicateCheckAgeDays} days. Voiding it was already requested; it was still outstanding at September 30. Confirm with the broker, place a stop-payment, then void.</p>
+			<div class="overflow-x-auto mt-4">
+				<table class="w-full min-w-[620px] text-sm bg-white rounded-xl border border-slate-200" style="font-variant-numeric: tabular-nums">
+					<caption class="sr-only">Unrestricted operating cash at the end of November after paying Otis and insurance</caption>
+					<thead class="text-left text-xs uppercase tracking-wider text-slate-500 bg-slate-50">
+						<tr><th class="px-4 py-3">Unrestricted cash after renewals</th><th class="px-4 py-3 text-right">Same premium</th><th class="px-4 py-3 text-right">Premium +10%</th><th class="px-4 py-3 text-right">Premium +25%</th></tr>
 					</thead>
-					<tbody class="divide-y divide-slate-100 text-slate-700">
-						{projectionScenarios.map(scenario => (
-							<tr class="align-top">
-								<td class="px-5 py-4"><p class="font-bold text-slate-950">{scenario.name}</p><p class="text-xs text-slate-500 mt-1">{scenario.assumption}</p></td>
-								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(scenario.revenue)}</td>
-								<td class="px-5 py-4 text-right whitespace-nowrap">{currency(scenario.expenses)}</td>
-								<td class={`px-5 py-4 text-right whitespace-nowrap font-extrabold ${scenario.result >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{scenario.result >= 0 ? '+' : ''}{currency(scenario.result)}</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-				<div class="p-5 border-t border-slate-200 bg-slate-50 text-xs text-slate-600 leading-relaxed"><strong>Reading the range:</strong> All four arithmetic cases remain positive, from about {currency(Math.min(...projectionScenarios.map(scenario => scenario.result)), 0)} to {currency(Math.max(...projectionScenarios.map(scenario => scenario.result)), 0)}. The YTD run-rate case is the high end; returning to budget for the remaining four months preserves the reported YTD surplus. The August case adds the maintenance credit back to each future month’s expense so it does not recur. All cases retain reported YTD actuals, including that credit. Any reversal would reduce YTD income and require recalculating the scenarios.</div>
-			</div>
-
-			<div class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-5 text-xs text-amber-900/80 leading-relaxed">
-				<strong>Projection limits:</strong> The model does not estimate seasonality, catch-up invoices, reserve expenditures, contract changes, utility growth, insurance renewal, delinquency, or warranty recovery. The latest closing log still reports {units.closedAtLatestClosingLog} units as of {units.closingDataAsOf}; no newer closing log was supplied. August gross utilities exceeded monthly budget. The insurance schedule runs to November 27 and the elevator contract to October 31, so renewal cash needs and later invoices may change the result.
-			</div>
-		</section>
-
-		<section aria-labelledby="document-control">
-			<div class="border-b border-slate-200 pb-3 mb-6">
-				<p class="text-xs font-bold uppercase tracking-[0.18em] text-rose-700 mb-1">Budget control and reserve transition</p>
-				<h2 id="document-control" class="text-2xl font-bold text-slate-950">The startup reserve basis is valid, but the first field study is now due</h2>
-			</div>
-
-			<div class="grid md:grid-cols-2 gap-5">
-				<div class="rounded-2xl border border-rose-200 bg-rose-50 p-6">
-					<p class="text-xs font-bold uppercase tracking-wider text-rose-700">2026 operating budget exhibit</p>
-					<h3 class="text-lg font-bold text-rose-950 mt-2">A valid 2025 partial-year exhibit was reused for full-year 2026</h3>
-					<p class="text-sm text-rose-900/80 mt-3 leading-relaxed">The {currency(reported.partialYearTotalPrintedInBudgetExhibit, 0)} total is appropriate for 2025: it equals seven startup months at approximately {currency(88_035.12)} per month. The problem is its inclusion, still labeled 2025, in the packet whose cover identifies fiscal 2026. The 2026 statements correctly use a full 12-month annual budget of {currency(reported.annualBudgetUsedInStatements, 0)}. Management should identify and distribute the board-adopted 12-month 2026 exhibit.</p>
-				</div>
-
-				<div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
-					<p class="text-xs font-bold uppercase tracking-wider text-emerald-700">New-development reserve basis</p>
-					<h3 class="text-lg font-bold text-emerald-950 mt-2">The DRE worksheet is the correct startup index</h3>
-					<p class="text-sm text-emerald-900/80 mt-3 leading-relaxed">No earlier property-specific reserve study exists or would be expected for the pre-operational development period. The DRE worksheet dated April 24, 2023 and revised November 27, 2023 is the governing developer estimate for startup reserve contributions. August's {currency(reported.monthlyReserveAllocation)} allocation tracks that model. Until the first field study is adopted, reserve estimates should continue to index against this schedule—not against a nonexistent 2024 or 2025 study.</p>
-					<p class="text-sm text-emerald-900/80 mt-3 leading-relaxed">The 2026 budget letter's statements that an on-site study occurred in 2024 and an accounting update occurred in 2025 are inconsistent with the Association's confirmed history and should be corrected as inaccurate template language.</p>
-				</div>
-
-				<div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
-					<p class="text-xs font-bold uppercase tracking-wider text-emerald-700">2025 model treatment</p>
-					<h3 class="text-lg font-bold text-emerald-950 mt-2">Seven months is the right scale for the startup year</h3>
-					<p class="text-sm text-emerald-900/80 mt-3 leading-relaxed">The Association began generating operating activity around May 2025, and the financial packages model seven operating months from June through December. The {currency(616_245)} break-even budget and {currency(149_561.60)} of scheduled reserve funding therefore represent the intended partial-year period. They should not be stretched into a 12-month 2025 comparison.</p>
-				</div>
-
-				<div class="rounded-2xl border border-blue-200 bg-blue-50 p-6">
-					<p class="text-xs font-bold uppercase tracking-wider text-blue-700">Special-assessment statement</p>
-					<h3 class="text-lg font-bold text-blue-950 mt-2">The board said none was anticipated—not that one was impossible</h3>
-					<p class="text-sm text-blue-900/80 mt-3 leading-relaxed">As of the November 2025 budget letter, the board did not anticipate a special assessment for major components or reserve adequacy and expressly said that statement was not a guarantee. That conclusion can presently be compared only with the generalized DRE startup model and current cash—not with actual component conditions, percent funded, or a long-range property-specific cash flow.</p>
-					<p class="text-sm text-blue-900/80 mt-3 leading-relaxed">California DRE's <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://www.dre.ca.gov/files/pdf/forms/re623.pdf" target="_blank" rel="noreferrer">RE 623 guidance</a> says a new association should conduct a reserve study after its first operating year to adjust the reserve funding plan. Civil Code <a class="font-bold underline decoration-blue-300 underline-offset-2" href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=5550." target="_blank" rel="noreferrer">§ 5550</a> separately requires a reasonably competent visual inspection at least every three years, when its statutory conditions apply, plus annual review of the study and funding plan.</p>
-				</div>
-			</div>
-		</section>
-
-		<section aria-labelledby="accounting-exceptions">
-			<div class="border-b border-slate-200 pb-3 mb-6">
-				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Accounting exceptions</p>
-				<h2 id="accounting-exceptions" class="text-2xl font-bold text-slate-950">Four unresolved controls shape confidence in the reported result</h2>
-			</div>
-
-			<div class="grid md:grid-cols-2 gap-5">
-				<div class="rounded-2xl border border-rose-200 bg-rose-50 p-6">
-					<p class="text-xs font-bold uppercase tracking-wider text-rose-700">Suspense debit</p>
-					<p class="text-3xl font-extrabold text-rose-800 mt-2">{currency(reported.suspenseDebit)}</p>
-					<p class="text-sm text-rose-900/80 mt-3 leading-relaxed">A March CollectBureau bank debit remains posted as a negative liability at August 31. If it belongs in operating expense, YTD surplus would fall to {currency(derivedFinancials.adjustedYtdSurplusIfSuspenseIsExpense)}. Support and classification are required before relying on the reported margin.</p>
-				</div>
-
-				<div class="rounded-2xl border border-amber-200 bg-amber-50 p-6">
-					<p class="text-xs font-bold uppercase tracking-wider text-amber-700">Insurance check</p>
-					<p class="text-3xl font-extrabold text-amber-800 mt-2">{currency(reported.unclearedPropertyInsuranceCheck)}</p>
-					<p class="text-sm text-amber-900/80 mt-3 leading-relaxed">The December 1 property-insurance check remained uncleared on the August 31 reconciliation, roughly nine months after issue. Confirm coverage, payee status, and whether another payment occurred, then void or reissue as necessary while preventing a duplicate payment.</p>
-				</div>
-
-				<div class="rounded-2xl border border-amber-200 bg-amber-50 p-6">
-					<p class="text-xs font-bold uppercase tracking-wider text-amber-700">Uncleared maintenance credit</p>
-					<p class="text-3xl font-extrabold text-amber-800 mt-2">{currency(reported.unclearedMaintenanceCredit)}</p>
-					<p class="text-sm text-amber-900/80 mt-3 leading-relaxed">An August 31 entry increased operating ledger cash and reduced common-area maintenance expense. The receipt remained uncleared on the August bank reconciliation. Obtain supporting documentation and subsequent bank clearance; without this credit, August’s surplus would be {currency(derivedFinancials.latestMonthSurplusExcludingMaintenanceCredit)}.</p>
-				</div>
-
-				<div class="rounded-2xl border border-amber-200 bg-amber-50 p-6">
-					<p class="text-xs font-bold uppercase tracking-wider text-amber-700">Expense variance quality</p>
-					<p class="text-3xl font-extrabold text-amber-800 mt-2">Reconcile</p>
-					<p class="text-sm text-amber-900/80 mt-3 leading-relaxed">The {currency(derivedFinancials.ytdExpenseVariance)} favorable YTD variance includes lines with no actual charges despite budget, recurring costs posted against very small or zero budgets, and vendor activity in alternate categories. Reconcile the adopted budget, account mapping, and accrual completeness before using the variance as a forecast.</p>
-				</div>
-			</div>
-			<div class="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-950 leading-relaxed">
-				<strong>Still reconciled:</strong> The {currency(reported.insuranceAmortizationMonthly)} monthly amortization agrees to the {currency(reported.insurancePackageTotal)} package—{currency(reported.propertyInsurancePremium)} property plus {currency(reported.workersCompPremium)} workers’ compensation. The {currency(36_063.22)} prepaid insurance balance also agrees to the schedule. Confirm payment status and prepare for the November 27 renewal.
-			</div>
-		</section>
-
-		<section aria-labelledby="revenue-quality">
-			<div class="border-b border-slate-200 pb-3 mb-6">
-				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Revenue and occupancy</p>
-				<h2 id="revenue-quality" class="text-2xl font-bold text-slate-950">Closings change payer mix and utility behavior</h2>
-			</div>
-
-			<div class="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
-				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-					<p class="text-xs font-bold uppercase tracking-wider text-indigo-700">Closing progress</p>
-					<div class="flex items-baseline gap-2 mt-2"><p class="text-3xl font-extrabold text-slate-950">{units.closedAtLatestClosingLog}</p><p class="text-sm text-slate-500">of {units.total} · {percent(derivedFinancials.closingShareAtLatestClosingLog)}</p></div>
-					<p class="text-sm text-slate-600 mt-3 leading-relaxed">The latest supplied closing log showed {derivedFinancials.remainingAtLatestClosingLog} units remaining as of {units.closingDataAsOf}; this is not an August 31 closing count. Assessments on unsold units are assessment revenue, not a discretionary subsidy; the payer changes from developer to owner as units close.</p>
-					<p class="text-xs text-slate-500 mt-3 leading-relaxed">Assessments are charged on the first of each month. The {currency(reported.latestDeveloperBilling)} August developer bill used a July 31 escrow cutoff and listed {reported.statementDeveloperUnsoldUnits} unsold units; differences from the recorder-based log reflect billing-cycle timing and closing prorations. The August statement and developer invoice both show no amount still due.</p>
-				</div>
-
-				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-					<p class="text-xs font-bold uppercase tracking-wider text-indigo-700">August net receivables</p>
-					<p class="text-3xl font-extrabold text-slate-950 mt-2">{currency(reported.accountsReceivable)}</p>
-					<p class="text-xs text-slate-500 mt-1">{currency(reported.ownerAssessmentsReceivable)} owners + {currency(reported.otherReceivables)} other − {currency(reported.allowanceForDoubtfulAccounts)} allowance. Developer receivables: {currency(reported.developerAssessmentsReceivable)}.</p>
-					<p class="text-sm text-slate-600 mt-4 leading-relaxed">Owner aging shows {currency(reported.ownerReceivablesOlderThan30Days)} over 30 days, including {currency(reported.ownerReceivablesOlderThan90Days)} over 90 days. The allowance equals the over-90-day bucket. The developer balance and payment-in-transit account were both zero at August 31.</p>
-				</div>
-
-				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-					<p class="text-xs font-bold uppercase tracking-wider text-cyan-700">YTD water recovery</p>
-					<p class="text-3xl font-extrabold text-slate-950 mt-2">{currency(derivedFinancials.waterReimbursementsMonthlyAverage)}</p>
-					<p class="text-xs text-slate-500 mt-1">Average monthly reimbursement from {currency(reported.ytdWaterReimbursements)} in January–August.</p>
-					<div class="mt-5">
-						<div class="flex justify-between text-xs font-semibold text-slate-600 mb-2"><span>Against monthly budget benchmark</span><span>{percent(derivedFinancials.waterRecoveryAgainstFullOccupancyBudget, 0)}</span></div>
-						<div class="h-2.5 rounded-full bg-slate-100 overflow-hidden" role="img" aria-label={`${percent(derivedFinancials.waterRecoveryAgainstFullOccupancyBudget, 0)} of the monthly water reimbursement budget`}><div class="h-full rounded-full bg-cyan-500" style={`width: ${Math.min(derivedFinancials.waterRecoveryAgainstFullOccupancyBudget * 100, 100)}%`}></div></div>
-					</div>
-					<p class="text-xs text-slate-500 mt-4 leading-relaxed">Submeter revenue was {currency(derivedFinancials.waterReimbursementShortfall)} below YTD budget. Other income partly offset that gap, while total assessment revenue was also below budget.</p>
-				</div>
-
-				<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-					<p class="text-xs font-bold uppercase tracking-wider text-cyan-700">Actual net utilities</p>
-					<p class="text-3xl font-extrabold text-slate-950 mt-2">{currency(derivedFinancials.ytdNetUtilitiesMonthlyAverage)}</p>
-					<p class="text-xs text-slate-500 mt-1">Monthly average: {currency(derivedFinancials.grossUtilitiesMonthlyAverage)} gross less {currency(derivedFinancials.waterReimbursementsMonthlyAverage)} reimbursement.</p>
-					<p class="text-sm text-slate-600 mt-4 leading-relaxed">The {currency(derivedFinancials.fullOccupancyIllustrativeNetUtilities)} amount obtained by subtracting the full-budget reimbursement from current gross cost is only an illustration. Usage and cost are likely to rise with occupancy, so it is not a current “true cost.”</p>
-				</div>
-			</div>
-		</section>
-
-		<section aria-labelledby="expense-watchlist">
-			<div class="border-b border-slate-200 pb-3 mb-6">
-				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">Property operations</p>
-				<h2 id="expense-watchlist" class="text-2xl font-bold text-slate-950">Exceptions for invoice-level management</h2>
-			</div>
-
-			<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-				<table class="w-full min-w-[860px] text-sm">
-					<thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
-						<tr><th class="px-5 py-4 font-bold">Priority</th><th class="px-5 py-4 font-bold">Category</th><th class="px-5 py-4 font-bold">Period</th><th class="px-5 py-4 font-bold text-right">Amount</th><th class="px-5 py-4 font-bold">Management response</th></tr>
-					</thead>
-					<tbody class="divide-y divide-slate-100 text-slate-700">
-						{watchItems.map(item => (
-							<tr class="align-top">
-								<td class="px-5 py-4"><span class={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${priorityClass(item.priority)}`}>{item.priority}</span></td>
-								<td class="px-5 py-4"><p class="font-bold text-slate-950">{item.category}</p><p class="text-xs text-slate-500 mt-1">{item.detail}</p></td>
-								<td class="px-5 py-4 whitespace-nowrap">{item.period}</td>
-								<td class="px-5 py-4 font-bold text-slate-950 text-right whitespace-nowrap">{currency(item.amount)}</td>
-								<td class="px-5 py-4 text-xs leading-relaxed max-w-md">{item.action}</td>
+					<tbody class="divide-y divide-slate-100">
+						{cashRows.map(row => (
+							<tr>
+								<td class="px-4 py-3 text-slate-700">{row.label}</td>
+								{[row.flat, row.plus10, row.plus25].map(value => (
+									<td class="px-4 py-3 text-right">
+										<span class="font-semibold text-slate-950">{compact(value)}</span>
+										{value < 0 && <span class="ml-2 inline-flex rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[10px] font-bold uppercase text-rose-800">✕ Short</span>}
+									</td>
+								))}
 							</tr>
 						))}
 					</tbody>
 				</table>
 			</div>
+			<details class="mt-3 text-xs text-slate-600">
+				<summary class="cursor-pointer font-semibold text-blue-800">Assumptions and caveats</summary>
+				<ul class="list-disc pl-5 mt-2 space-y-1 leading-relaxed">
+					<li>Starts from {currency(reported.unrestrictedOperatingCash, 2)} at Sep 30 (ledger cash less the amount owed to reserves). October–November repeat September’s cash change; “resumes” adds a typical {currency(11_600)} monthly remittance plus the missing September one.</li>
+					<li>Pays the Otis renewal ({currency(reported.elevatorContract.annual, 2)}) and the insurance package ({currency(reported.insurance.package, 2)} last year) in full.</li>
+					<li>“Voided” rows assume nothing is owed back to the developer for the premium. If reimbursement is owed, use the “not voided” rows.</li>
+					<li>Janitorial labor has not been paid since December 2025. If those invoices exist but were never billed, up to ≈$30k would reduce every cell.</li>
+					<li>Excludes reserve cash and the October developer payment, both restricted. Prepaid assessments ({currency(reported.prepaidAssessments)}) and deposits ({currency(reported.refundableDeposits)}) are still owed to owners. Premium installments are the fallback; a temporary reserve transfer (Civ. Code §5515) is a last resort.</li>
+				</ul>
+			</details>
 		</section>
 
-		<section class="rounded-3xl bg-slate-950 text-white p-6 md:p-8" aria-labelledby="management-plan">
-			<div class="grid lg:grid-cols-[0.7fr_1.3fr] gap-8">
-				<div>
-					<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-300 mb-2">Board and management plan</p>
-					<h2 id="management-plan" class="text-2xl md:text-3xl font-extrabold">Six priorities before the next financial review</h2>
-					<p class="text-sm text-slate-300 leading-relaxed mt-4">These items address the highest-value accounting, cash, reserve, and property-management risks found in the source packages.</p>
+		<section aria-labelledby="q-receivables">
+			<div class="border-b border-slate-200 pb-3 mb-5">
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">1 · Receivables</p>
+				<h2 id="q-receivables" class="text-2xl font-bold text-slate-950">Booked receivables are clean; the gaps are money never billed or received</h2>
+			</div>
+			<div class="grid gap-4 sm:grid-cols-3 mb-5">
+				<div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-sm text-slate-500">Owner balances</p><p class="text-2xl font-bold text-slate-950">{currency(reported.receivables.owners)}</p><p class="text-xs text-slate-600 mt-1">{currency(reported.receivables.ownersOver30, 2)} over 30 days ({reported.receivables.ownerAccountsOver30} accounts)</p></div>
+				<div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-sm text-slate-500">“Other” receivable</p><p class="text-2xl font-bold text-slate-950">{currency(reported.receivables.other)}</p><p class="text-xs text-slate-600 mt-1">Duplicate billing; write off</p></div>
+				<div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-sm text-slate-500">Developer</p><p class="text-2xl font-bold text-slate-950">{currency(reported.receivables.developer)}</p><p class="text-xs text-slate-600 mt-1">All units sold; billing has ended</p></div>
+			</div>
+
+			<figure class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+				<figcaption class="mb-3">
+					<p class="font-bold text-slate-950">Water bill vs. MeterNet remittances</p>
+					<p class="text-xs text-slate-600">Since June 2025 MeterNet returned {percent(derivedFinancials.submeterRemittedTotal / derivedFinancials.submeterWaterTotal, 0)} of water cost; May–Aug 2026 ran near full recovery.</p>
+				</figcaption>
+				<div class="flex flex-wrap gap-4 text-xs text-slate-600 mb-2">
+					<span class="inline-flex items-center gap-2"><span class="inline-block h-0.5 w-5 rounded" style={`background:${contextHue}`}></span>Water cost</span>
+					<span class="inline-flex items-center gap-2"><span class="inline-block h-0.5 w-5 rounded" style={`background:${positiveHue}`}></span>MeterNet remittance</span>
 				</div>
-				<ol class="grid sm:grid-cols-2 gap-4 text-sm">
-					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">01 · Reporting</span><p class="text-slate-300 mt-2">Record the board-review status of the supplied packages, complete September on schedule, and require written explanations for material variances.</p></li>
-					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">02 · Cash</span><p class="text-slate-300 mt-2">Continue and document repayment of the {currency(reported.reserveDueFromOperating)} interfund balance while preserving an operating-cash floor.</p></li>
-					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">03 · Exceptions</span><p class="text-slate-300 mt-2">Resolve the CollectBureau suspense debit and stale insurance check, and verify the maintenance credit’s support and bank clearance.</p></li>
-					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">04 · Budget</span><p class="text-slate-300 mt-2">Identify the adopted 12-month pro forma, correct the packet exhibits, and reconcile its account mapping to the monthly ledger.</p></li>
-					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">05 · Reserves</span><p class="text-slate-300 mt-2">Commission the first independent property-specific reserve study now that the startup year has passed. Continue indexing interim contributions to the DRE schedule, then formally adopt the study's component plan and long-range funding recommendation.</p></li>
-					<li class="rounded-2xl border border-slate-700 bg-slate-900 p-4"><span class="text-blue-300 font-extrabold">06 · Operations</span><p class="text-slate-300 mt-2">Maintain system-level exception logs for fire/life-safety, elevators, plumbing, access control, landscape, and janitorial work, including warranty and developer recovery.</p></li>
-				</ol>
+				<div class="overflow-x-auto">
+					<svg viewBox={`0 0 ${waterChart.width} ${waterChart.height}`} class="w-full min-w-[560px] max-w-[820px] h-auto" role="img" aria-label="Monthly water cost and MeterNet remittances, June 2025 to September 2026">
+						{[0, 5_000, 10_000, 15_000].map(tick => (
+							<g>
+								<line x1={waterChart.left} x2={waterChart.width - waterChart.right} y1={waterY(tick)} y2={waterY(tick)} stroke={tick === 0 ? ink.axis : ink.grid} stroke-width="1" />
+								<text x={waterChart.left - 6} y={waterY(tick) + 3} text-anchor="end" font-size="10" fill={ink.muted} style="font-variant-numeric: tabular-nums">{tick === 0 ? '0' : `${tick / 1000}K`}</text>
+							</g>
+						))}
+						{submeterHistory.map((point, index) => (index % 3 === 0 || index === submeterHistory.length - 1) && (
+							<text x={waterX(index)} y={waterChart.height - 8} text-anchor="middle" font-size="10" fill={ink.muted}>{point.month}</text>
+						))}
+						<path d={linePath('water')} fill="none" stroke={contextHue} stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+						<path d={linePath('remitted')} fill="none" stroke={positiveHue} stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+						<circle cx={waterX(submeterHistory.length - 1)} cy={waterY(lastWater.water)} r="4" fill={contextHue} stroke="#fcfcfb" stroke-width="2" />
+						<circle cx={waterX(submeterHistory.length - 1)} cy={waterY(lastWater.remitted)} r="4" fill={positiveHue} stroke="#fcfcfb" stroke-width="2" />
+						<text x={waterX(submeterHistory.length - 1) + 10} y={waterY(lastWater.water) + 4} font-size="10" fill={ink.secondary}>Water {compact(lastWater.water)}</text>
+						<text x={waterX(submeterHistory.length - 1) + 10} y={waterY(lastWater.remitted) - 4} font-size="10" font-weight="600" fill={ink.primary}>Sep: $0 received</text>
+						<text x={waterX(2.6)} y={waterY(12_200)} text-anchor="middle" font-size="10" fill={ink.secondary}>No remittances Jun–Nov 2025</text>
+						{submeterHistory.map((point, index) => (
+							<rect x={waterX(index) - waterStep / 2} y={waterChart.top} width={waterStep} height={waterPlotHeight} fill="transparent">
+								<title>{`${point.month}: water ${currency(point.water, 2)}, remitted ${currency(point.remitted, 2)}`}</title>
+							</rect>
+						))}
+					</svg>
+				</div>
+				<details class="mt-3 text-sm">
+					<summary class="cursor-pointer font-semibold text-blue-800">Monthly table</summary>
+					<div class="overflow-x-auto mt-2">
+						<table class="w-full min-w-[420px] text-sm" style="font-variant-numeric: tabular-nums">
+							<thead class="text-left text-xs uppercase tracking-wider text-slate-500"><tr><th class="py-2">Month</th><th class="py-2 text-right">Water cost</th><th class="py-2 text-right">Remitted</th></tr></thead>
+							<tbody class="divide-y divide-slate-100">
+								{submeterHistory.map(point => <tr><td class="py-1">{point.month}</td><td class="py-1 text-right">{currency(point.water, 2)}</td><td class="py-1 text-right">{currency(point.remitted, 2)}</td></tr>)}
+								<tr class="font-bold"><td class="py-1">Total</td><td class="py-1 text-right">{currency(derivedFinancials.submeterWaterTotal, 2)}</td><td class="py-1 text-right">{currency(derivedFinancials.submeterRemittedTotal, 2)}</td></tr>
+							</tbody>
+						</table>
+					</div>
+					<p class="text-xs text-slate-500 mt-2">At the budget’s {percent(submeterGap.budgetRecoveryRatio)} recovery ratio, the cumulative shortfall is {currency(submeterGap.total)}: {currency(submeterGap.startup)} from start-up months and {currency(submeterGap.september)} for September. Aggregate recovery does not show whether individual meters misread; that needs MeterNet’s read history.</p>
+				</details>
+			</figure>
+
+			<div class="grid gap-4 md:grid-cols-2 mt-5">
+				{tiers.map(tier => (
+					<div class="rounded-xl border border-slate-200 bg-white p-4">
+						<p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">{tier.title}</p>
+						<ul class="space-y-3">
+							{receivableGaps.filter(gap => gap.tier === tier.key).map(gap => (
+								<li>
+									<div class="flex items-baseline justify-between gap-3">
+										<span class="text-sm font-semibold text-slate-950">{gap.item}</span>
+										<span class="text-sm font-semibold text-slate-950 whitespace-nowrap">{gap.tier === 'question' ? '≈' : ''}{currency(gap.amount)}</span>
+									</div>
+									<p class="text-xs text-slate-600 mt-0.5 leading-relaxed">{gap.note}</p>
+								</li>
+							))}
+						</ul>
+					</div>
+				))}
 			</div>
 		</section>
 
-		<section class="grid lg:grid-cols-[1fr_0.8fr] gap-6" aria-labelledby="sources-method">
-			<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-				<h2 id="sources-method" class="text-xl font-bold text-slate-950 mb-3">Sources and method</h2>
-				<p class="text-sm text-slate-600 leading-relaxed mb-4">This update extracted the 91 pages in the July and August packages, reconciled their balances and operating results, traced material entries to ledgers and bank reconciliations, and visually checked the controlling statement pages. Earlier startup, budget, and reserve findings use the prior review baseline. Sources:</p>
-				<ul class="list-disc pl-5 text-sm text-slate-700 space-y-1.5 mb-5">
-					{sourceDocuments.map(source => <li>{source}</li>)}
-				</ul>
-				<p class="text-xs text-slate-500 leading-relaxed"><strong>Key page checks:</strong> July package: PDF pages 2–5, 9–12, 18, and 25–26. August package: PDF pages 2–4 (statements), 8–11 and 16 (reserve schedule and bank reconciliations), 21 (aggregate aging), 24–38 (ledger), and 39–42 (prepaids and developer billing).</p>
-				<p class="text-xs text-slate-500 leading-relaxed mt-3"><strong>Scope limitation:</strong> This is an analytical review, not an audit, reserve study, legal opinion, or attestation of board approval. Private source documents are intentionally excluded from the published repository.</p>
+		<section aria-labelledby="q-spending">
+			<div class="border-b border-slate-200 pb-3 mb-5">
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">2 · Spending</p>
+				<h2 id="q-spending" class="text-2xl font-bold text-slate-950">Paid lines run {compact(totalOverrun)}/mo over budget; unpaid lines hide it</h2>
 			</div>
+			<div class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+				<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+					<p class="font-bold text-slate-950">Monthly overrun at current rates</p>
+					<p class="text-xs text-slate-600 mb-4">Current monthly run-rate minus 2026 monthly budget.</p>
+					<ul class="space-y-3">
+						{overruns.map(row => (
+							<li>
+								<div class="flex items-baseline justify-between gap-3 text-sm">
+									<span class="font-semibold text-slate-950">{row.category}</span>
+									<span class="text-slate-950 font-semibold whitespace-nowrap" style="font-variant-numeric: tabular-nums">+{compact(row.over)}<span class="text-xs font-normal text-slate-500"> · {compact(row.budget)} → {compact(row.current)}</span></span>
+								</div>
+								<div class="mt-1 h-2 rounded-full bg-slate-100" title={`${row.category}: ${currency(row.budget)} budget vs ${currency(row.current)} current per month`}>
+									<div class="h-2 rounded-r-full" style={`width:${(row.over / maxOverrun) * 100}%;background:${positiveHue}`}></div>
+								</div>
+								<p class="text-xs text-slate-600 mt-1">{row.cause}</p>
+							</li>
+						))}
+					</ul>
+				</div>
+				<div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+					<p class="font-bold text-amber-950">Why YTD is still positive</p>
+					<p class="text-xs text-amber-900/80 mb-3">Budgeted lines the Association is not paying for yet (annual budget).</p>
+					<ul class="space-y-3">
+						{unpaidBudgetLines.map(line => (
+							<li>
+								<div class="flex items-baseline justify-between gap-3 text-sm"><span class="font-semibold text-amber-950">{line.category}</span><span class="font-semibold text-amber-950 whitespace-nowrap">{currency(line.budget)}</span></div>
+								<p class="text-xs text-amber-900/80 mt-0.5 leading-relaxed">{line.note}</p>
+							</li>
+						))}
+					</ul>
+				</div>
+			</div>
+		</section>
 
-			<div class="rounded-2xl border border-blue-200 bg-blue-50 p-6">
-				<h2 class="text-xl font-bold text-blue-950 mb-3">Records still needed</h2>
-				<ul class="list-disc pl-5 text-sm text-blue-900/80 space-y-2 mb-5">
-					<li>Monthly board-review or approval records for the supplied packages; September financials when the month closes</li>
-					<li>Adopted 12-month 2026 pro forma, account-level budget export, and board minutes</li>
-					<li>First independent property-specific reserve study following the initial operating year</li>
-					<li>Year-end review or audit and tax return</li>
-					<li>Documented reserve repayment plan, suspense and insurance-payment support, and subsequent bank clearance of the maintenance credit</li>
-				</ul>
-				<a href="/cb-archive/#records-request" class="inline-flex items-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-800 transition">How to request records →</a>
+		<section aria-labelledby="q-coding">
+			<div class="border-b border-slate-200 pb-3 mb-5">
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">3 · Coding</p>
+				<h2 id="q-coding" class="text-2xl font-bold text-slate-950">The garage cost center can’t be priced from these books</h2>
+				<p class="text-sm text-slate-600 mt-2 max-w-3xl">CC&amp;R §6.9.2 requires separate garage accounting. Today garage income is split across two accounts, building telecom is charged to the garage, and most garage costs sit in general accounts.</p>
 			</div>
+			<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+				<table class="w-full text-sm">
+					<thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500"><tr><th class="px-4 py-3">Correction</th><th class="px-4 py-3 text-right">Amount</th></tr></thead>
+					<tbody class="divide-y divide-slate-100">
+						{codingFixes.map(fix => (
+							<tr class="align-top">
+								<td class="px-4 py-3"><p class="font-semibold text-slate-950">{fix.fix}</p><p class="text-xs text-slate-600 mt-0.5">{fix.detail}</p></td>
+								<td class="px-4 py-3 text-right font-semibold text-slate-950 whitespace-nowrap" style="font-variant-numeric: tabular-nums">{currency(fix.amount)}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+			<details class="mt-3 text-sm">
+				<summary class="cursor-pointer font-semibold text-blue-800">Garage cost center, reported vs. restated (Jan–Sep)</summary>
+				<div class="overflow-x-auto mt-3">
+					<table class="w-full min-w-[440px] text-sm" style="font-variant-numeric: tabular-nums">
+						<thead class="text-left text-xs uppercase tracking-wider text-slate-500"><tr><th class="py-2"></th><th class="py-2 text-right">Reported</th><th class="py-2 text-right">Restated</th><th class="py-2 text-right">Budget</th></tr></thead>
+						<tbody class="divide-y divide-slate-100">
+							<tr><td class="py-1.5">Revenue</td><td class="py-1.5 text-right">{currency(garageCostCenter.reported.revenue)}</td><td class="py-1.5 text-right">{currency(garageCostCenter.restated.revenue)}</td><td class="py-1.5 text-right">{currency(garageCostCenter.ytdBudget)}</td></tr>
+							<tr><td class="py-1.5">Expenses incl. reserves</td><td class="py-1.5 text-right">{currency(garageCostCenter.reported.expenses)}</td><td class="py-1.5 text-right">{currency(garageCostCenter.restated.expensesLow)}–{currency(garageCostCenter.restated.expensesHigh)}</td><td class="py-1.5 text-right">{currency(garageCostCenter.ytdBudget)}</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<p class="text-xs text-slate-500 mt-2">{garageCostCenter.spaces} spaces at {currency(garageCostCenter.feePerSpace)}/month (budget assumed {currency(garageCostCenter.budgetPerSpace, 2)}). Restated revenue adds parking-license income; restated expenses remove building telecom and add garage electricity, gates, insurance, management, and reserve-study shares. The board should adopt a written allocation method before setting the 2027 garage fee.</p>
+			</details>
+		</section>
+
+		<section aria-labelledby="q-reserves">
+			<div class="border-b border-slate-200 pb-3 mb-5">
+				<p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700 mb-1">4 · Reserves and 2027</p>
+				<h2 id="q-reserves" class="text-2xl font-bold text-slate-950">Trim reserves at most 10% now; fix solar and revenue leaks first</h2>
+			</div>
+			<div class="grid gap-4 sm:grid-cols-3">
+				<div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-sm text-slate-500">Reserve contribution</p><p class="text-2xl font-bold text-slate-950">{compact(reported.annualReserveContribution)}/yr</p><p class="text-xs text-slate-600 mt-1">{percent(derivedFinancials.reserveShareOfBudget)} of budget · {percent(derivedFinancials.reserveShareOfAssessments)} of assessments</p></div>
+				<div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-sm text-slate-500">Projected fund, Dec 31</p><p class="text-2xl font-bold text-slate-950">≈{compact(reserves.projectedYearEnd)}</p><p class="text-xs text-slate-600 mt-1">Excludes the designated developer payment</p></div>
+				<div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-sm text-slate-500">Percent funded (estimate)</p><p class="text-2xl font-bold text-slate-950">{percent(reserves.percentFundedRange[0], 0)}–{percent(reserves.percentFundedRange[1], 0)}</p><p class="text-xs text-slate-600 mt-1">Depends on the DRE list correction below</p></div>
+			</div>
+			<p class="text-sm text-slate-700 mt-4 leading-relaxed max-w-4xl">The DRE worksheet appears to book 4 outdoor tables and 15 benches as {compact(reserves.dreTablesAndBenches)}/yr—{percent(derivedFinancials.dreCorrectionShare, 0)} of the contribution—probably replacement costs entered as annual amounts. If {reserves.studyVendorEngaged} confirms it, the straight-line need is ≈{compact(reserves.dreCorrectedNeed)}/yr. Elevators and building systems look underfunded, so any cut should wait for the study and be indexed +3%/yr afterward.</p>
+			<details class="mt-2 text-sm">
+				<summary class="cursor-pointer font-semibold text-blue-800">Reserve details</summary>
+				<ul class="list-disc pl-5 mt-2 space-y-1 text-xs text-slate-600 leading-relaxed">
+					<li>Fund at Sep 30: {currency(reported.reserveBankCash, 2)} in the bank plus {currency(reported.reserveDueFromOperating, 2)} owed by operating ({percent(derivedFinancials.reserveBankedShare)} banked). Garage cost-center reserve {currency(reported.reserveCostCenterBalance, 2)}. No reserve spending since inception.</li>
+					<li>30-year cash-flow test on the DRE components (3% inflation): only a cut of 10% or less ({currency(derivedFinancials.reserveCutValue(reserves.safeCutNow))}/yr) passes every tested case. About 25% passes if the table/bench correction holds and contributions are indexed.</li>
+					<li>Reserve cash earns ≈{percent(reported.reserveYield, 2)}. Each point of yield on ≈$400k is ≈$4k/yr; insured CDs or Treasuries under a board investment policy are a low-risk lever.</li>
+					<li>The “5% + CPI, 10% maximum” assessment cap was not found in any archived document; it matches California’s tenant rent-cap formula. Davis-Stirling allows up to 20% without a member vote (Civ. Code §5605) if the budget report is complete. Any affordable-housing limit would be in the city program documents, which are not in the archive.</li>
+				</ul>
+			</details>
+
+			<div class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 md:p-6 shadow-sm" data-model>
+				<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-2 mb-4">
+					<div>
+						<h3 class="text-xl font-bold text-slate-950">2027 margin model</h3>
+						<p class="text-xs text-slate-600">Assessment increase needed to break even in 2027. Start from the normalized 2026 run-rate, then adjust.</p>
+					</div>
+					<p class="text-xs text-slate-500">1% of member assessments = {currency(derivedFinancials.onePercentOfAssessments)}/yr</p>
+				</div>
+
+				<div class="overflow-x-auto mb-6">
+					<table class="w-full text-sm" style="font-variant-numeric: tabular-nums">
+						<thead class="text-left text-xs uppercase tracking-wider text-slate-500 bg-slate-50"><tr><th class="px-3 py-2">Scenario</th><th class="px-3 py-2 text-right">Assessments needed</th><th class="px-3 py-2 text-right">Change</th></tr></thead>
+						<tbody class="divide-y divide-slate-100">
+							{model2027Scenarios.map(scenario => (
+								<tr class="align-top">
+									<td class="px-3 py-2"><p class="font-semibold text-slate-950">{scenario.name}</p><p class="text-xs text-slate-600">{scenario.note}</p></td>
+									<td class="px-3 py-2 text-right">{currency(scenario.result.memberAssessmentsNeeded)}</td>
+									<td class="px-3 py-2 text-right font-bold text-slate-950">{signedPercent(scenario.result.increase)}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+
+				<div class="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+					<form class="space-y-4 text-sm" data-model-form>
+						<label class="block">
+							<span class="flex justify-between"><span class="font-semibold text-slate-950">Insurance renewal</span><output data-out="insuranceIncrease">+{Math.round(model2027Defaults.insuranceIncrease * 100)}%</output></span>
+							<input class="w-full accent-blue-700" type="range" name="insuranceIncrease" min="0" max="30" step="5" value={model2027Defaults.insuranceIncrease * 100} />
+						</label>
+						<label class="block">
+							<span class="flex justify-between"><span class="font-semibold text-slate-950">Reserve contribution</span><output data-out="reserveShare">{Math.round(model2027Defaults.reserveShare * 100)}% of today</output></span>
+							<input class="w-full accent-blue-700" type="range" name="reserveShare" min="70" max="100" step="5" value={model2027Defaults.reserveShare * 100} />
+						</label>
+						<label class="block">
+							<span class="flex justify-between"><span class="font-semibold text-slate-950">MeterNet recovery of water cost</span><output data-out="submeterRecovery">{Math.round(model2027Defaults.submeterRecovery * 100)}%</output></span>
+							<input class="w-full accent-blue-700" type="range" name="submeterRecovery" min="70" max="100" step="5" value={model2027Defaults.submeterRecovery * 100} />
+						</label>
+						<fieldset class="space-y-2">
+							<legend class="sr-only">Toggles</legend>
+							<label class="flex gap-2 items-start"><input type="checkbox" name="solarRestored" class="mt-1 accent-blue-700" /> <span>Solar credit restored (−{compact(48_355)}/yr)</span></label>
+							<label class="flex gap-2 items-start"><input type="checkbox" name="restoreDeferredServices" class="mt-1 accent-blue-700" checked /> <span>Window washing, solar O&amp;M, HVAC, sweeping restart</span></label>
+							<label class="flex gap-2 items-start"><input type="checkbox" name="janitorialHigh" class="mt-1 accent-blue-700" /> <span>Janitorial at DRE rate ({compact(69_797)}) instead of last rate ({compact(40_200)})</span></label>
+							<label class="flex gap-2 items-start"><input type="checkbox" name="electricitySpikePersists" class="mt-1 accent-blue-700" /> <span>Sep–Oct electricity usage spike persists</span></label>
+						</fieldset>
+					</form>
+
+					<div>
+						<p class="text-sm text-slate-500">Increase needed</p>
+						<p class="text-5xl font-bold text-slate-950" data-hero>{signedPercent(baseline.increase)}</p>
+						<p class="text-xs text-slate-600 mt-1" data-hero-detail>≈{signed((baseline.increase) * averageMonthlyAssessment)} per month for the average unit (today {currency(averageMonthlyAssessment, 2)})</p>
+						<div class="relative mt-4 mb-6 h-2 rounded-full bg-blue-100" aria-hidden="true">
+							<div class="h-2 rounded-full" data-meter style={`width:${Math.max(0, Math.min(baseline.increase / meterMax, 1)) * 100}%;background:${positiveHue}`}></div>
+							{[0.05, 0.10, 0.20].map(mark => (
+								<span class="absolute top-0 h-4 -mt-1 border-l border-slate-500" style={`left:${(mark / meterMax) * 100}%`}><span class="absolute top-4 -translate-x-1/2 text-[10px] text-slate-500 whitespace-nowrap">{mark === 0.2 ? '20% no-vote max' : `${mark * 100}%`}</span></span>
+							))}
+						</div>
+						<ol class="text-sm divide-y divide-slate-100 border-t border-slate-200" data-bridge style="font-variant-numeric: tabular-nums">
+							<li class="flex justify-between py-1.5"><span>2026 pace (Jan–Sep annualized)</span><span class="font-semibold">{signed(baselineBridge.start)}</span></li>
+							{baselineBridge.items.map(item => <li class="flex justify-between py-1.5"><span>{item.label}</span><span>{signed(item.value)}</span></li>)}
+							<li class="flex justify-between py-1.5 font-bold"><span>2027 at current assessments</span><span>{signed(baselineBridge.end)}</span></li>
+						</ol>
+					</div>
+				</div>
+				<details class="mt-4 text-xs text-slate-600">
+					<summary class="cursor-pointer font-semibold text-blue-800">Model assumptions</summary>
+					<p class="mt-2 leading-relaxed">Normalized Jan–Sep 2026 run-rate with one-offs removed and current vendor rates (refuse ≈$9.0k/mo, water ≈$11.7k/mo, electricity ≈$6.0k/mo, management ≈$7.2k/mo), +3% inflation, water +4%, 3% contingency, garage revenue at the 2026 pace ({currency(51_000)}), and current reserve funding ({currency(reported.annualReserveContribution)}). Excludes the Mid-Block payment and the designated developer payment. Scenarios, not predictions.</p>
+				</details>
+			</div>
+		</section>
+
+		<section aria-labelledby="after-sep" class="rounded-2xl border border-slate-200 bg-slate-50 p-5 md:p-6">
+			<h2 id="after-sep" class="text-xl font-bold text-slate-950 mb-3">After September 30</h2>
+			<ul class="grid gap-4 md:grid-cols-3 text-sm">
+				{subsequentEvents.map(event => (
+					<li><p class="font-semibold text-slate-950">{event.title}</p><p class="text-xs text-slate-600 mt-1 leading-relaxed">{event.detail}</p></li>
+				))}
+				<li><p class="font-semibold text-slate-950">Mid-Block maintenance payment</p><p class="text-xs text-slate-600 mt-1 leading-relaxed">A recorded agreement ({midBlockAgreement.recordedOn}) obligates the Association to pay {currency(midBlockAgreement.payment)} on {midBlockAgreement.trigger}, then every {midBlockAgreement.cycleYears} years (CPI-adjusted, capped at {percent(midBlockAgreement.annualCpiCap)}/yr). No date is set. Plan for it in reserves or the designated fund.</p></li>
+			</ul>
+		</section>
+
+		<section aria-label="Tracking and sources" class="space-y-3">
+			<details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+				<summary class="cursor-pointer text-lg font-bold text-slate-950">Open items</summary>
+				<ul class="mt-4 divide-y divide-slate-100">
+					{openItems.map(item => (
+						<li class="py-3 grid gap-2 sm:grid-cols-[9rem_1fr] sm:items-start">
+							<span class={`inline-flex w-fit items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${statusClass[item.status]}`}><span aria-hidden="true">{statusIcon[item.status]}</span>{item.status}</span>
+							<span><span class="text-sm font-semibold text-slate-950">{item.item}.</span> <span class="text-sm text-slate-600">{item.detail}</span></span>
+						</li>
+					))}
+				</ul>
+			</details>
+			<details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+				<summary class="cursor-pointer text-lg font-bold text-slate-950">Records to request</summary>
+				<ul class="list-disc pl-5 mt-3 space-y-1 text-sm text-slate-700">{recordsNeeded.map(record => <li>{record}</li>)}</ul>
+				<a href="/cb-archive/#records-request" class="inline-flex mt-4 items-center rounded-lg bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800 transition">How to request records →</a>
+			</details>
+			<details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+				<summary class="cursor-pointer text-lg font-bold text-slate-950">Sources and method</summary>
+				<ul class="list-disc pl-5 mt-3 space-y-1 text-sm text-slate-700">{sourceDocuments.map(source => <li>{source}</li>)}</ul>
+				<p class="text-xs text-slate-500 leading-relaxed mt-3">Every month was rebuilt from the general ledger and ties to the reported totals. September’s balance sheet and reserve schedule were checked visually; income statement lines were cross-checked against the monthly summary and the ledger rebuild. Balance sheet, equity bridge ({currency(reported.operatingEquity, 2)}), operating cash, and reserve fund reconcile at September 30. Owner-level records were used only in aggregate.</p>
+				<p class="text-xs text-slate-500 leading-relaxed mt-2"><strong>Scope:</strong> analytical review, not an audit, reserve study, or legal opinion. Estimates are labeled. Board approval of the statements was not verified. Private source documents are excluded from this site.</p>
+			</details>
 		</section>
 	</div>
 </BaseLayout>
+
+<script>
+	import { bridge2027, model2027Defaults, runModel2027 } from '../../data/financialOverview';
+
+	const root = document.querySelector<HTMLElement>('[data-model]');
+	const form = root?.querySelector<HTMLFormElement>('[data-model-form]');
+	const averageMonthlyAssessment = 817_387 / 148 / 12;
+	const meterMax = 0.25;
+
+	const compact = (value: number) => {
+		const sign = value < 0 ? '−' : '';
+		const abs = Math.abs(value);
+		return abs >= 1000 ? `${sign}$${(abs / 1000).toFixed(1)}k` : `${sign}$${Math.round(abs)}`;
+	};
+	const signed = (value: number) => (value > 0 ? '+' : '') + compact(value);
+	const signedPercent = (value: number) =>
+		(value > 0 ? '+' : value < 0 ? '−' : '') + `${Math.abs(value * 100).toFixed(1)}%`;
+
+	function render() {
+		if (!root || !form) return;
+		const data = new FormData(form);
+		const input = {
+			...model2027Defaults,
+			insuranceIncrease: Number(data.get('insuranceIncrease')) / 100,
+			reserveShare: Number(data.get('reserveShare')) / 100,
+			submeterRecovery: Number(data.get('submeterRecovery')) / 100,
+			solarRestored: data.has('solarRestored'),
+			restoreDeferredServices: data.has('restoreDeferredServices'),
+			janitorial: data.has('janitorialHigh') ? 69_797 : 40_200,
+			electricitySpikePersists: data.has('electricitySpikePersists'),
+		};
+		const result = runModel2027(input);
+		const bridge = bridge2027(input);
+
+		root.querySelector('[data-hero]')!.textContent = signedPercent(result.increase);
+		root.querySelector('[data-hero-detail]')!.textContent =
+			`≈${signed(result.increase * averageMonthlyAssessment)} per month for the average unit (today $${averageMonthlyAssessment.toFixed(2)})`;
+		root.querySelector<HTMLElement>('[data-meter]')!.style.width =
+			`${Math.max(0, Math.min(result.increase / meterMax, 1)) * 100}%`;
+		root.querySelector('[data-out="insuranceIncrease"]')!.textContent = `+${Math.round(input.insuranceIncrease * 100)}%`;
+		root.querySelector('[data-out="reserveShare"]')!.textContent = `${Math.round(input.reserveShare * 100)}% of today`;
+		root.querySelector('[data-out="submeterRecovery"]')!.textContent = `${Math.round(input.submeterRecovery * 100)}%`;
+
+		const list = root.querySelector('[data-bridge]')!;
+		const row = (label: string, value: string, bold = false) => {
+			const item = document.createElement('li');
+			item.className = `flex justify-between py-1.5${bold ? ' font-bold' : ''}`;
+			const name = document.createElement('span');
+			name.textContent = label;
+			const amount = document.createElement('span');
+			amount.textContent = value;
+			item.append(name, amount);
+			return item;
+		};
+		list.replaceChildren(
+			row('2026 pace (Jan–Sep annualized)', signed(bridge.start)),
+			...bridge.items.map(item => row(item.label, signed(item.value))),
+			row('2027 at current assessments', signed(bridge.end), true),
+		);
+	}
+
+	form?.addEventListener('input', render);
+	form?.addEventListener('submit', event => event.preventDefault());
+	render();
+</script>
