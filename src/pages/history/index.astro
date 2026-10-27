@@ -6,7 +6,7 @@ const totalUnits = 148;
 const currentClosed = closings[closings.length - 1].total;
 const remainingUnits = totalUnits - currentClosed;
 const absorptionRate = ((currentClosed / totalUnits) * 100).toFixed(1);
-const closingDataAsOf = 'July 20, 2026';
+const closingDataAsOf = 'August 6, 2026';
 const recentClosings = closings.slice(-4);
 
 // Chart dimensions & logic
@@ -108,7 +108,7 @@ const years = ['all', '2019', '2020', '2021', '2022', '2023', '2024', '2025', '2
 					Tracking cumulative homeowner unit closings from building completion through {closingDataAsOf}.
 				</p>
 				<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-1">
-					<span class="text-blue-500">Source:</span> SF Assessor & Recorder Office · July is month-to-date
+					<span class="text-blue-500">Source:</span> SF Assessor & Recorder Office · July total updated August 6
 				</p>
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 					<div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
