@@ -161,7 +161,7 @@ export const financialOverview = {
 
   subsequentEvents: [
     { title: 'All units sold', detail: 'Management reports every unit is sold, so developer assessment billing is ending; September’s bill covered two units.' },
-    { title: 'Developer contribution: Mid-Block and sidewalks', detail: 'Management reports a one-time $300,000 developer payment, being deposited in October. It is a general contribution toward the Mid-Block payment and sinking-sidewalk repairs, not tied to an invoice. Track it as a designated fund: not operating income, and not counted toward reserve adequacy.' },
+    { title: 'Developer contribution: Mid-Block and sidewalks', detail: 'Management reports a one-time $300,000 developer payment, being deposited in October. It is a general contribution toward sinking-sidewalk repairs and future Mid-Block obligations, not tied to an invoice. Track it as a designated fund: not operating income, and not counted toward reserve adequacy.' },
   ],
   midBlockAgreement: {
     payment: 103_191,
@@ -187,7 +187,7 @@ export const financialOverview = {
     { item: 'Suspense debit', status: 'Open', detail: '$5,298.26 since March; no activity.' },
     { item: 'Unidentified receipts', status: 'Open', detail: '$3,786 (Aug, cleared Sep 1) and $1,778.80 (Jun) credited to expense with no payer.' },
     { item: 'Reserve repayment', status: 'On track', detail: '$42,732 left = the unfunded Nov–Dec 2025 allocations. Two installments finish it.' },
-    { item: 'Mid-Block maintenance payment', status: 'Unscheduled', detail: '$103,191 due when the Mid-Block transfers to MBMC (date unknown), repeating every 10 years. The developer contribution should cover the first payment; confirm the timeline and add later cycles and sidewalk settlement to the reserve study.' },
+    { item: 'Mid-Block maintenance payment', status: 'Verify', detail: 'The board understands the developer paid the first $103,191 at signing, outside the Association’s books. Get proof of payment so it is not billed again at transfer. The next payment is due 10 years after the transfer date; add it and sidewalk settlement to the reserve study.' },
     { item: 'Reserve study', status: 'Started', detail: 'Association Reserves paid $3,405 in September.' },
   ],
 
@@ -201,7 +201,7 @@ export const financialOverview = {
     'Board-approved garage cost-center allocation method',
     'Developer contribution deposit confirmation (October) and its account classification',
     'Sidewalk-settlement survey or repair estimate',
-    'Mid-Block transfer timeline from the developer and Mission Bay Maintenance Corporation',
+    'Proof the first Mid-Block payment was made (payer, payee, date) and the expected transfer date to Mission Bay Maintenance Corporation',
   ],
 
   sourceDocuments: [

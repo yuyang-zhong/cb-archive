@@ -521,7 +521,7 @@ const meterMax = 0.25;
 				{subsequentEvents.map(event => (
 					<li><p class="font-semibold text-slate-950">{event.title}</p><p class="text-xs text-slate-600 mt-1 leading-relaxed">{event.detail}</p></li>
 				))}
-				<li><p class="font-semibold text-slate-950">Mid-Block maintenance payment</p><p class="text-xs text-slate-600 mt-1 leading-relaxed">A recorded agreement ({midBlockAgreement.recordedOn}) obligates the Association to pay {currency(midBlockAgreement.payment)} on {midBlockAgreement.trigger}, then every {midBlockAgreement.cycleYears} years (CPI-adjusted, capped at {percent(midBlockAgreement.annualCpiCap)}/yr). No date is set. The developer contribution should cover the first payment; later cycles (up to ≈{compact(midBlockAgreement.payment * (1 + midBlockAgreement.annualCpiCap) ** midBlockAgreement.cycleYears)} in year 10) belong in the reserve study.</p></li>
+				<li><p class="font-semibold text-slate-950">Mid-Block maintenance payment</p><p class="text-xs text-slate-600 mt-1 leading-relaxed">A recorded agreement ({midBlockAgreement.recordedOn}) sets a {currency(midBlockAgreement.payment)} payment due on {midBlockAgreement.trigger}, then every {midBlockAgreement.cycleYears} years (CPI-adjusted, capped at {percent(midBlockAgreement.annualCpiCap)}/yr). The board understands the developer paid the first one at signing, outside the Association’s books; get proof of payment. The next payment (up to ≈{compact(midBlockAgreement.payment * (1 + midBlockAgreement.annualCpiCap) ** midBlockAgreement.cycleYears)}) falls 10 years after the transfer date and belongs in the reserve study.</p></li>
 			</ul>
 		</section>
 
